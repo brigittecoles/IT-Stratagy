@@ -1,0 +1,30 @@
+{
+  "name": "it-strategy-diagnostic",
+  "version": "2.2.0",
+  "description": "Benchmark IT spending, staffing, and investment posture against Gartner 2026 industry peers across 15 industries with full percentile distributions (P10–P90).",
+  "author": {
+    "name": "Brigitte Coles",
+    "url": "https://github.com/brigittecoles"
+  },
+  "homepage": "https://github.com/brigittecoles/IT-Stratagy",
+  "repository": "https://github.com/brigittecoles/IT-Stratagy",
+  "license": "UNLICENSED",
+  "keywords": ["it-strategy", "benchmarking", "gartner", "diagnostic", "consulting", "cio"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "IT Strategy Diagnostic",
+    "shortDescription": "Benchmark IT spending against Gartner 2026 industry peers",
+    "longDescription": "A comprehensive IT strategy diagnostic platform that benchmarks your company's IT spending, staffing, and investment posture against Gartner 2026 data across 15 industries. Supports intake via conversation, forms, or spreadsheet upload. Generates executive summaries, full 10-sheet reports, and chain-of-thought audit trails.",
+    "developerName": "Brigitte Coles",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://it-stratagy.vercel.app",
+    "defaultPrompt": [
+      "Run an IT strategy diagnostic for my company",
+      "Benchmark our IT spending against industry peers",
+      "Look up Gartner IT benchmarks for healthcare"
+    ],
+    "brandColor": "#002855"
+  }
+}

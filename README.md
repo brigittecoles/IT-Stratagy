@@ -70,7 +70,18 @@ npm run dev
 
 ## AI-Powered Analysis (MCP)
 
-For conversational AI analysis, connect the **MCP server** to Claude:
+For conversational AI analysis, connect the **MCP server** to any AI agent:
+
+### OpenAI Codex (auto-configures)
+
+Open Codex from inside the repo folder. The `.codex/config.toml` auto-connects 14 MCP tools.
+
+Or add it manually:
+```bash
+codex mcp add it-strategy-diagnostic -- npx tsx mcp-server/src/index.ts
+```
+
+Then just say: *"Run an IT strategy diagnostic for my company"*
 
 ### Claude Code (auto-configures)
 
