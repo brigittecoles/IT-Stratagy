@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# MCP server build artifacts
+mcp-server/node_modules
+mcp-server/dist
+
+# Claude Code local state
+.claude

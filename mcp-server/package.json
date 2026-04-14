@@ -1,0 +1,38 @@
+{
+  "name": "it-strategy-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for IT Strategy Diagnostic — 12 tools for benchmarking IT spend, staffing, and investment posture against Gartner 2026 industry peers",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "it-strategy-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "it-strategy",
+    "diagnostic",
+    "benchmarks",
+    "gartner",
+    "claude"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

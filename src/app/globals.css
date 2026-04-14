@@ -4,12 +4,77 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * ══════════════════════════════════════════════════════════════
+ * West Monroe Design System — Token Mapping
+ * Source: wm-design-system-mcp/data/tokens.json
+ * ══════════════════════════════════════════════════════════════
+ *
+ * Primitive palette:
+ *   Navy 700 (#070154) — brand primary / deep navy
+ *   Blue 500 (#0047FF) — action blue
+ *   Magenta 500 (#F900D3) — accent
+ *   Cyan 500 (#00E8FA) — info
+ *   Green 500 (#1DD566) — success
+ *   Gold 500 (#FFC700) — warning
+ *   Red 500 (#F52C00) — error
+ *   Slate 600 (#50658E) — secondary text
+ *   Slate 200 (#CED7E6) — borders
+ *   Slate 100 (#E8EEF8) — subtle bg
+ *   Slate 50 (#F4F7FC) — elevated bg
+ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
+
+  /* WM extended palette for direct use */
+  --color-wm-navy: #070154;
+  --color-wm-navy-800: #040029;
+  --color-wm-navy-600: #0A0275;
+  --color-wm-navy-400: #3333AB;
+  --color-wm-navy-200: #9999D5;
+  --color-wm-navy-100: #CCCCEB;
+  --color-wm-navy-50: #E8E8F5;
+  --color-wm-blue: #0047FF;
+  --color-wm-blue-700: #002967;
+  --color-wm-blue-600: #0037B8;
+  --color-wm-blue-400: #3370FF;
+  --color-wm-blue-300: #6699FF;
+  --color-wm-blue-200: #99BBFF;
+  --color-wm-blue-100: #CCDDFF;
+  --color-wm-blue-50: #E6EEFF;
+  --color-wm-magenta: #F900D3;
+  --color-wm-magenta-600: #C700AA;
+  --color-wm-magenta-400: #FA33DC;
+  --color-wm-magenta-300: #FB66E4;
+  --color-wm-magenta-200: #FC99ED;
+  --color-wm-magenta-100: #FECCF6;
+  --color-wm-magenta-50: #FEE6FB;
+  --color-wm-cyan: #00E8FA;
+  --color-wm-cyan-100: #CCFAFE;
+  --color-wm-cyan-50: #E6FDFF;
+  --color-wm-green: #1DD566;
+  --color-wm-green-100: #D2F6E0;
+  --color-wm-gold: #FFC700;
+  --color-wm-gold-100: #FFF4CC;
+  --color-wm-red: #F52C00;
+  --color-wm-red-100: #FDBFB8;
+  --color-wm-orange: #FF8A00;
+  --color-wm-purple: #B741FF;
+  --color-wm-slate-700: #3A4A68;
+  --color-wm-slate-600: #50658E;
+  --color-wm-slate-500: #6B7EA5;
+  --color-wm-slate-400: #8A9BBB;
+  --color-wm-slate-300: #97A4BA;
+  --color-wm-slate-200: #CED7E6;
+  --color-wm-slate-100: #E8EEF8;
+  --color-wm-slate-50: #F4F7FC;
+
+  /* shadcn token mappings */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,73 +113,110 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ── Light Mode: WM Design System ── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Page */
+  --background: #FFFFFF;
+  --foreground: #070154;
+
+  /* Card */
+  --card: #FFFFFF;
+  --card-foreground: #070154;
+
+  /* Popover */
+  --popover: #FFFFFF;
+  --popover-foreground: #070154;
+
+  /* Primary — WM Blue (action color) */
+  --primary: #0047FF;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary — WM Slate subtle */
+  --secondary: #E8EEF8;
+  --secondary-foreground: #070154;
+
+  /* Muted — WM elevated/subtle bg */
+  --muted: #F4F7FC;
+  --muted-foreground: #50658E;
+
+  /* Accent — WM Magenta (brand accent) */
+  --accent: #F900D3;
+  --accent-foreground: #FFFFFF;
+
+  /* Destructive — WM Red */
+  --destructive: #F52C00;
+
+  /* Borders — WM Slate */
+  --border: #CED7E6;
+  --input: #CED7E6;
+
+  /* Ring — WM Blue (focus) */
+  --ring: #0047FF;
+
+  /* Charts — WM palette */
+  --chart-1: #070154;
+  --chart-2: #0047FF;
+  --chart-3: #F900D3;
+  --chart-4: #00E8FA;
+  --chart-5: #1DD566;
+
+  /* Radius — WM uses 8px (0.5rem) as base */
+  --radius: 0.5rem;
+
+  /* Sidebar — WM Navy */
+  --sidebar: #070154;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #0047FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-ring: #0047FF;
 }
 
+/* ── Dark Mode: WM Design System (navy-based) ── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #020012;
+  --foreground: #E8EEF8;
+
+  --card: #040029;
+  --card-foreground: #E8EEF8;
+
+  --popover: #040029;
+  --popover-foreground: #E8EEF8;
+
+  --primary: #3370FF;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #0A0275;
+  --secondary-foreground: #E8EEF8;
+
+  --muted: #070154;
+  --muted-foreground: #97A4BA;
+
+  --accent: #FA33DC;
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #F97566;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #3370FF;
+
+  --chart-1: #CCCCEB;
+  --chart-2: #3370FF;
+  --chart-3: #FA33DC;
+  --chart-4: #33EDFB;
+  --chart-5: #4ADD85;
+
+  --sidebar: #020012;
+  --sidebar-foreground: #E8EEF8;
+  --sidebar-primary: #3370FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #E8EEF8;
+  --sidebar-border: rgba(255, 255, 255, 0.10);
+  --sidebar-ring: #3370FF;
 }
 
 @layer base {
@@ -128,3 +230,104 @@
     @apply font-sans;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+ * WM Design System — Component Utilities
+ * ══════════════════════════════════════════════════════════════ */
+
+/* Overline / Eyebrow pattern: magenta uppercase small text */
+.wm-overline {
+  font-size: 0.5625rem; /* 9px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #F900D3;
+}
+
+/* Stat callout — large magenta number */
+.wm-stat-value {
+  font-weight: 700;
+  color: #F900D3;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.wm-stat-value-sm { font-size: 1.5rem; }
+.wm-stat-value-md { font-size: 2.25rem; }
+.wm-stat-value-lg { font-size: 3rem; }
+.wm-stat-value-display { font-size: 4rem; }
+.wm-stat-label {
+  font-size: 0.6875rem; /* 11px */
+  color: #50658E;
+}
+
+/* Key Message Block — navy bg, white/magenta text */
+.wm-key-message {
+  background-color: #070154;
+  color: #FFFFFF;
+  padding: 3rem 2rem;
+  border-radius: 0.75rem;
+}
+.wm-key-message-highlight {
+  color: #F900D3;
+}
+
+/* WM Data Table header — navy bg, white text */
+.wm-table-header {
+  background-color: #070154;
+  color: #FFFFFF;
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.wm-table-header th {
+  padding: 0.6875rem 0.875rem;
+}
+
+/* Card accent border (magenta left) */
+.wm-card-accent {
+  border-left: 3px solid #F900D3;
+}
+
+/* Section divider — decorative magenta bar */
+.wm-divider-brand {
+  height: 3px;
+  background-color: #F900D3;
+  border: none;
+  border-radius: 9999px;
+}
+
+/* WM elevation shadows (using navy tint instead of black) */
+.wm-shadow-sm { box-shadow: 0 1px 3px rgba(7, 1, 84, 0.08); }
+.wm-shadow-md { box-shadow: 0 4px 12px rgba(7, 1, 84, 0.10); }
+.wm-shadow-lg { box-shadow: 0 8px 24px rgba(7, 1, 84, 0.12); }
+.wm-shadow-xl { box-shadow: 0 16px 48px rgba(7, 1, 84, 0.16); }
+
+/* Phase timeline overline */
+.wm-phase-overline {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #F900D3;
+}
+
+/* Alert variants */
+.wm-alert {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid;
+}
+.wm-alert-success { border-left-color: #1DD566; background-color: #D2F6E0; }
+.wm-alert-warning { border-left-color: #FFC700; background-color: #FFF4CC; }
+.wm-alert-error { border-left-color: #F52C00; background-color: #FDBFB8; }
+.wm-alert-info { border-left-color: #00E8FA; background-color: #CCFAFE; }
+
+/* Badge semantic colors */
+.wm-badge-primary { background-color: #CCDDFF; color: #0037B8; }
+.wm-badge-accent { background-color: #FECCF6; color: #C700AA; }
+.wm-badge-success { background-color: #D2F6E0; color: #0A7B3E; }
+.wm-badge-warning { background-color: #FFF4CC; color: #8B6B00; }
+.wm-badge-error { background-color: #FDBFB8; color: #B82200; }
+.wm-badge-info { background-color: #CCFAFE; color: #007B8A; }
+.wm-badge-neutral { background-color: #E8EEF8; color: #50658E; }
