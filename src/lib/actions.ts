@@ -17,9 +17,21 @@ import type { EngineResult } from '@/lib/engine/types';
 const resultsCache = new Map<string, EngineResult>();
 
 // ── Create a new analysis and redirect to form ──
-export async function createNewAnalysis(mode: 'form' | 'wizard' | 'upload') {
-  const analysis = createAnalysis();
+export async function createNewAnalysis(
+  mode: 'form' | 'wizard' | 'file-drop',
+  targetLevel?: string,
+) {
+  const analysis = createAnalysis({
+    target_diagnostic_level: targetLevel,
+  });
   redirect(`/analysis/${analysis.id}/${mode}`);
+}
+
+// ── Get analysis controls (for reading target level) ──
+export async function getAnalysisControls(analysisId: string) {
+  const analysis = getAnalysis(analysisId);
+  if (!analysis) return null;
+  return analysis.controls;
 }
 
 // ── Save intake data from form ──

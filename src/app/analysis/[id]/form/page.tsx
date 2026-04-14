@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CompanyProfileForm } from '@/components/intake/CompanyProfileForm';
@@ -9,7 +9,8 @@ import { WorkforceForm } from '@/components/intake/WorkforceForm';
 import { TransformationForm } from '@/components/intake/TransformationForm';
 import { FileDropZone } from '@/components/intake/FileDropZone';
 import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
-import { saveIntakeData } from '@/lib/actions';
+import { saveIntakeData, getAnalysisControls } from '@/lib/actions';
+import { DiagnosticLevelBanner } from '@/components/intake/DiagnosticLevelBanner';
 import type { CompanyProfile, FiscalYear } from '@/lib/schema/validation';
 
 const STEPS: readonly { label: string; key: string; optional?: boolean }[] = [
@@ -106,6 +107,16 @@ export default function FormIntakePage() {
   );
 
   const [submitting, setSubmitting] = useState(false);
+  const [targetLevel, setTargetLevel] = useState<string>('Standard Diagnostic');
+
+  // Load the target level from the analysis controls
+  useEffect(() => {
+    getAnalysisControls(params.id as string).then((controls) => {
+      if (controls?.target_diagnostic_level) {
+        setTargetLevel(controls.target_diagnostic_level);
+      }
+    });
+  }, [params.id]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -126,16 +137,39 @@ export default function FormIntakePage() {
 
   const isLastStep = step === STEPS.length - 1;
 
+  // Compute provided fields for level banner
+  const providedFields: string[] = [];
+  if (formState.company.company_name) providedFields.push('company_name');
+  if (formState.company.industry_gics_group) providedFields.push('industry_gics_group');
+  if (formState.currentYear.revenue) providedFields.push('revenue');
+  if (formState.currentYear.total_it_spend) providedFields.push('total_it_spend');
+  if (formState.transformation.transformation_status) providedFields.push('transformation_status');
+  if (formState.currentYear.it_opex_spend) providedFields.push('it_opex_spend');
+  if (formState.currentYear.it_capex_spend) providedFields.push('it_capex_spend');
+  if (formState.workforce.employee_count) providedFields.push('employee_count');
+  if (formState.workforce.it_fte_count) providedFields.push('it_fte_count');
+  const hasDetailedFile = Object.values(formState.files).some(f => f !== null);
+  if (hasDetailedFile) providedFields.push('detailed_file_available');
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-4">
         <h1 className="text-2xl font-bold text-foreground">
           IT Strategy Diagnostic
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Complete each section to build your diagnostic profile.
         </p>
+      </div>
+
+      {/* Diagnostic level requirements */}
+      <div className="mb-8">
+        <DiagnosticLevelBanner
+          targetLevel={targetLevel}
+          providedFields={providedFields}
+          compact
+        />
       </div>
 
       {/* Step Indicator */}

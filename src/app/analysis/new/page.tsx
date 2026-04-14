@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -8,6 +8,7 @@ import {
   MessageSquareText,
   Upload,
   Gauge,
+  Loader2,
 } from 'lucide-react';
 import {
   Card,
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DIAGNOSTIC_LEVELS } from '@/lib/schema/value-lists';
+import { createNewAnalysis } from '@/lib/actions';
 
 const INTAKE_MODES = [
   {
@@ -27,7 +29,6 @@ const INTAKE_MODES = [
     detail:
       'Best when you have IT spend figures, headcounts, and revenue numbers ready. Fastest path to a diagnostic.',
     icon: ClipboardList,
-    href: '/analysis/new/form',
     badge: 'Fastest',
   },
   {
@@ -37,7 +38,6 @@ const INTAKE_MODES = [
     detail:
       'We walk you through each data point with context and guidance. Great if you are unsure what numbers to provide.',
     icon: MessageSquareText,
-    href: '/analysis/new/wizard',
     badge: 'Recommended',
   },
   {
@@ -47,7 +47,6 @@ const INTAKE_MODES = [
     detail:
       'Upload IT budgets, vendor lists, org charts, or project portfolios. Our parser will extract the key data points.',
     icon: Upload,
-    href: '/analysis/new/file-drop',
     badge: 'Most data',
   },
 ] as const;
@@ -65,6 +64,15 @@ const LEVEL_DESCRIPTIONS: Record<string, string> = {
 
 export default function NewAnalysisPage() {
   const [selectedLevel, setSelectedLevel] = useState<string>('Standard Diagnostic');
+  const [isPending, startTransition] = useTransition();
+  const [pendingMode, setPendingMode] = useState<string | null>(null);
+
+  const handleSelectMode = (mode: 'form' | 'wizard' | 'file-drop') => {
+    setPendingMode(mode);
+    startTransition(async () => {
+      await createNewAnalysis(mode, selectedLevel);
+    });
+  };
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -136,13 +144,25 @@ export default function NewAnalysisPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {INTAKE_MODES.map((mode) => {
             const Icon = mode.icon;
+            const isLoading = isPending && pendingMode === mode.key;
             return (
-              <Link key={mode.key} href={mode.href}>
-                <Card className="group h-full cursor-pointer transition-all hover:shadow-[0_4px_12px_rgba(7,1,84,0.10)]">
+              <button
+                key={mode.key}
+                onClick={() => handleSelectMode(mode.key)}
+                disabled={isPending}
+                className="text-left"
+              >
+                <Card className={`group h-full cursor-pointer transition-all hover:shadow-[0_4px_12px_rgba(7,1,84,0.10)] ${
+                  isLoading ? 'opacity-70' : ''
+                } ${isPending && !isLoading ? 'opacity-50' : ''}`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="rounded-md bg-wm-navy-50 p-2">
-                        <Icon className="h-5 w-5 text-wm-navy" />
+                        {isLoading ? (
+                          <Loader2 className="h-5 w-5 text-wm-navy animate-spin" />
+                        ) : (
+                          <Icon className="h-5 w-5 text-wm-navy" />
+                        )}
                       </div>
                       <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                         mode.badge === 'Recommended' ? 'wm-badge-accent' : 'wm-badge-neutral'
@@ -159,7 +179,7 @@ export default function NewAnalysisPage() {
                     </p>
                   </CardContent>
                 </Card>
-              </Link>
+              </button>
             );
           })}
         </div>

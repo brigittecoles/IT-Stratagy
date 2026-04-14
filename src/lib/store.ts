@@ -6,9 +6,10 @@ import type { CanonicalAnalysis } from '@/lib/schema/validation';
 
 const store = new Map<string, CanonicalAnalysis>();
 
-export function createAnalysis(): CanonicalAnalysis {
+export function createAnalysis(options?: {
+  target_diagnostic_level?: string;
+}): CanonicalAnalysis {
   const id = uuidv4();
-  const now = new Date().toISOString();
 
   const analysis: CanonicalAnalysis = {
     id,
@@ -18,7 +19,7 @@ export function createAnalysis(): CanonicalAnalysis {
     },
     fiscal_years: [],
     controls: {
-      target_diagnostic_level: 'Quick Read',
+      target_diagnostic_level: (options?.target_diagnostic_level as CanonicalAnalysis['controls']['target_diagnostic_level']) ?? 'Quick Read',
       intake_preference: 'Best Available',
       proceed_status: 'draft',
       analysis_name: null,
