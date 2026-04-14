@@ -1,24 +1,45 @@
 # IT Strategy Diagnostic — Setup Guide
 
-## Quickest Start (no technical knowledge needed)
+## Easiest: Use the Hosted Version
 
-### Mac
-1. Download/clone the IT-Stratagy folder
-2. In **Finder**, double-click **`setup.command`**
-3. Your browser will open automatically
+Visit **https://it-stratagy.vercel.app** — nothing to install.
 
-### Windows
-1. Download/clone the IT-Stratagy folder
-2. In **File Explorer**, double-click **`setup.bat`**
-3. Your browser will open automatically
-
-> These scripts automatically install a JavaScript runtime (Bun) if you don't have one — no admin access required.
+Or deploy your own in 30 seconds: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbrigittecoles%2FIT-Stratagy)
 
 ---
 
-## Manual Setup (Terminal)
+## Option 1: AI Agent Setup (No Terminal Knowledge Needed)
 
-### If you have npm (Node.js):
+Paste this into **Claude Code**, **Codex**, or any AI coding agent:
+
+> Clone https://github.com/brigittecoles/IT-Stratagy.git, install dependencies with `npm install` in both the root and the `mcp-server/` folder, then start the dev server with `npm run dev`. Open http://localhost:3456 in my browser.
+
+The AI does everything. You never touch a terminal.
+
+---
+
+## Option 2: Double-Click Setup (Mac / Windows)
+
+### Step 1: Download
+Go to: **https://github.com/brigittecoles/IT-Stratagy/archive/refs/heads/main.zip**
+
+### Step 2: Unzip
+Double-click the downloaded `.zip` file to extract it.
+
+### Step 3: Run
+- **Mac**: Double-click **`setup.command`**
+- **Windows**: Double-click **`setup.bat`**
+
+### Step 4: Done
+Your browser opens automatically to the diagnostic tool.
+
+> These scripts auto-install a JavaScript runtime (Bun) if you don't have one — no admin access required.
+
+---
+
+## Option 3: Manual Terminal Setup
+
+### With npm (Node.js):
 ```bash
 git clone https://github.com/brigittecoles/IT-Stratagy.git
 cd IT-Stratagy
@@ -28,7 +49,7 @@ npm run dev
 # → http://localhost:3456
 ```
 
-### If you have Bun:
+### With Bun:
 ```bash
 git clone https://github.com/brigittecoles/IT-Stratagy.git
 cd IT-Stratagy
@@ -40,21 +61,12 @@ bun run dev
 
 ### Don't have npm or Bun?
 
-**Mac** — install Bun with one command:
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
+**Mac**: `curl -fsSL https://bun.sh/install | bash`
+**Windows** (PowerShell): `irm bun.sh/install.ps1 | iex`
 
-**Windows** — install Bun in PowerShell:
-```powershell
-irm bun.sh/install.ps1 | iex
-```
-
-Then restart your terminal and follow the Bun instructions above.
+Then restart your terminal and follow the instructions above.
 
 ### Custom port
-
-If port 3456 is already in use:
 
 ```bash
 PORT=4567 npm run dev       # Mac/Linux
@@ -63,22 +75,20 @@ set PORT=4567 && npm run dev  # Windows
 
 ---
 
-## MCP Server Setup (Claude Code / Claude Desktop)
+## MCP Server Setup (AI-Powered Analysis)
 
-### Claude Code (recommended)
+The MCP server lets Claude drive analyses conversationally. The Web UI works without this — MCP is optional.
 
-The `.mcp.json` in the repo root auto-configures Claude Code. Open Claude Code from inside the IT-Stratagy folder — the 14 MCP tools connect automatically.
+### Claude Code (auto-configures)
 
-Verify:
-```
-/mcp
-# Should show: • it-strategy-diagnostic: connected (14 tools)
-```
+Open Claude Code from inside the IT-Stratagy folder. The `.mcp.json` auto-connects 14 tools.
+
+Verify: run `/mcp` — should show `it-strategy-diagnostic: connected (14 tools)`
 
 ### Claude Desktop
 
 Add to your config file:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
@@ -96,41 +106,11 @@ Restart Claude Desktop after saving.
 
 ---
 
-## Guided Setup (via Claude)
-
-If you're using Claude Code or Claude Desktop with the MCP connected, just say:
-
-```
-Run setup_guide
-```
-
-This will check your system, find an available port, and give step-by-step instructions.
-
----
-
 ## Requirements
 
 | Component | Requires |
 |-----------|----------|
-| Web UI | Node.js v24+ **or** Bun |
+| Hosted (Vercel) | Nothing — just a browser |
+| Web UI (local) | Node.js v24+ **or** Bun |
 | MCP Server | Node.js v24+ **or** Bun |
 | One-click setup | Nothing pre-installed (auto-installs Bun) |
-
-## MCP Tools Reference (14 tools)
-
-| Tool | Purpose |
-|------|---------|
-| `setup_guide` | Interactive setup — checks prereqs, ports, provides instructions |
-| `check_port` | Check if a port is available, suggests alternatives |
-| `get_benchmarks` | Query Gartner 2026 benchmarks (15 industries, P10-P90) |
-| `create_analysis` | Start a new analysis |
-| `submit_intake` | Add financial, workforce, transformation data |
-| `check_qualification` | Check diagnostic level qualification |
-| `run_analysis` | Execute the full analysis pipeline |
-| `get_results` | Get completed results |
-| `list_analyses` | List all analyses |
-| `get_analysis_detail` | Get full analysis with intake data |
-| `export_summary` | Markdown executive summary |
-| `generate_report` | 10-sheet report with calculations & narrative guidance |
-| `get_report_template` | Report template structure (slots, sections) |
-| `get_chain_of_thought` | Full reasoning audit trail (JSON or markdown) |
