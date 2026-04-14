@@ -9,7 +9,13 @@ import { ConfidenceBadge } from '@/components/results/ConfidenceBadge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getAnalysisResults, getAnalysisForReview } from '@/lib/actions';
+import {
+  getAnalysisResults,
+  getAnalysisForReview,
+  exportExecutiveSummary,
+  exportFullReport,
+  exportChainOfThought,
+} from '@/lib/actions';
 import type {
   EngineResult,
   BenchmarkGap,
@@ -22,6 +28,7 @@ import type { ConfidenceLevel } from '@/lib/schema/value-lists';
 import {
   BarChart3, Target, Lightbulb, ShieldCheck, TrendingUp,
   AlertCircle, CheckCircle, Info, AlertTriangle, Loader2, ArrowLeft,
+  Download, FileText, FileSearch, Scroll,
 } from 'lucide-react';
 
 const TABS = [
@@ -30,6 +37,7 @@ const TABS = [
   { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },
   { id: 'findings', label: 'Findings & Recommendations', icon: Lightbulb },
   { id: 'caveats', label: 'Caveats & QA', icon: ShieldCheck },
+  { id: 'export', label: 'Export Reports', icon: Download },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -402,6 +410,152 @@ export default function ResultsPage() {
             </Card>
           </div>
         )}
+
+        {/* ── Export Reports Tab ── */}
+        {activeTab === 'export' && (
+          <ExportPanel analysisId={analysisId} companyName={companyName} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Export Panel Component ──
+
+function ExportPanel({ analysisId, companyName }: { analysisId: string; companyName: string }) {
+  const [generating, setGenerating] = useState<string | null>(null);
+
+  const downloadMarkdown = (content: string, filename: string) => {
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExport = async (type: 'summary' | 'full' | 'cot') => {
+    setGenerating(type);
+    try {
+      let content: string | null = null;
+      let filename: string;
+      const slug = companyName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+
+      switch (type) {
+        case 'summary':
+          content = await exportExecutiveSummary(analysisId);
+          filename = `${slug}_Executive_Summary.md`;
+          break;
+        case 'full':
+          content = await exportFullReport(analysisId);
+          filename = `${slug}_Full_Report.md`;
+          break;
+        case 'cot':
+          content = await exportChainOfThought(analysisId);
+          filename = `${slug}_Chain_of_Thought.md`;
+          break;
+      }
+
+      if (content) {
+        downloadMarkdown(content, filename);
+      }
+    } catch (err) {
+      console.error('Export failed:', err);
+    }
+    setGenerating(null);
+  };
+
+  const EXPORTS = [
+    {
+      key: 'summary' as const,
+      title: 'Executive Summary',
+      description: 'One-page markdown with key metrics, benchmark gaps, opportunities, and findings. Perfect for sharing with leadership.',
+      icon: FileText,
+      badge: 'Quick share',
+    },
+    {
+      key: 'full' as const,
+      title: 'Full Report (10 Sheets)',
+      description: 'Complete structured report with all 10 diagnostic sheets — financials, benchmarks, gap analysis, opportunities, workforce, and recommendations.',
+      icon: Scroll,
+      badge: 'Comprehensive',
+    },
+    {
+      key: 'cot' as const,
+      title: 'Chain of Thought',
+      description: 'Full audit trail showing every calculation, benchmark comparison, and confidence assessment. Essential for client review and validation.',
+      icon: FileSearch,
+      badge: 'Audit trail',
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <span className="wm-overline">Deliverables</span>
+          <CardTitle className="mt-1">Export Reports</CardTitle>
+          <CardDescription>
+            Download diagnostic reports as markdown files. Each report contains the full analysis with all data, calculations, and narrative.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {EXPORTS.map((exp) => {
+            const Icon = exp.icon;
+            const isGenerating = generating === exp.key;
+            return (
+              <div
+                key={exp.key}
+                className="flex items-center gap-4 rounded-lg border border-border p-4 hover:bg-muted/30 transition-colors"
+              >
+                <div className="rounded-lg bg-wm-navy-50 p-3">
+                  <Icon className="size-6 text-wm-navy" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-sm">{exp.title}</h4>
+                    <span className="wm-badge-neutral rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                      {exp.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                    {exp.description}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => handleExport(exp.key)}
+                  disabled={generating !== null}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-1" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="size-4 mr-1" />
+                      Download .md
+                    </>
+                  )}
+                </Button>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <div className="wm-key-message">
+        <span className="wm-phase-overline">Tip</span>
+        <p className="leading-relaxed text-white/90 mt-2">
+          These markdown reports render beautifully in Notion, Confluence, or any markdown viewer.
+          For a polished slide deck, paste the Executive Summary into your preferred presentation tool.
+        </p>
       </div>
     </div>
   );

@@ -279,3 +279,273 @@ Format each section header on its own line like "EXECUTIVE_SUMMARY:" followed by
 
   return result;
 }
+
+// ── Bridge: EngineResult → AnalysisResults for report module ──
+
+function bridgeToReportData(
+  engineResult: EngineResult,
+  analysis: CanonicalAnalysis,
+): import('@/lib/report').AnalysisResults {
+  const fy = analysis.fiscal_years.find(y => y.fiscal_year_label === 'Current Fiscal Year') ?? analysis.fiscal_years[0];
+  const priorFy = analysis.fiscal_years.find(y => y.fiscal_year_label === 'Last Fiscal Year');
+
+  return {
+    company_name: analysis.company.company_name,
+    industry: analysis.company.industry_gics_group,
+    fiscal_year_label: fy?.fiscal_year_label ?? 'Current Fiscal Year',
+    qualification_level: engineResult.qualified_level,
+
+    revenue: fy?.revenue ?? 0,
+    total_it_spend: fy?.total_it_spend ?? 0,
+    it_opex_spend: fy?.it_opex_spend ?? 0,
+    it_capex_spend: fy?.it_capex_spend ?? 0,
+    employee_count: fy?.employee_count ?? 0,
+    it_fte_count: fy?.it_fte_count ?? 0,
+
+    prior_revenue: priorFy?.revenue ?? undefined,
+    prior_it_spend: priorFy?.total_it_spend ?? undefined,
+    prior_it_opex: priorFy?.it_opex_spend ?? undefined,
+    prior_it_capex: priorFy?.it_capex_spend ?? undefined,
+
+    it_spend_pct_revenue: engineResult.core_kpis.it_spend_pct_revenue.value,
+    it_opex_pct_revenue: engineResult.core_kpis.opex_pct_revenue.suppressed ? undefined : engineResult.core_kpis.opex_pct_revenue.value,
+    it_capex_pct_revenue: engineResult.core_kpis.capex_pct_revenue.suppressed ? undefined : engineResult.core_kpis.capex_pct_revenue.value,
+    it_spend_per_employee: (fy?.employee_count && fy?.total_it_spend) ? fy.total_it_spend / fy.employee_count : undefined,
+    it_fte_ratio: (fy?.it_fte_count && fy?.employee_count) ? fy.it_fte_count / fy.employee_count : undefined,
+
+    benchmark_industry: engineResult.benchmark?.family.industry_gics_group ?? analysis.company.industry_gics_group,
+    benchmark_median: engineResult.benchmark?.raw_gaps?.[0]?.benchmark_median ?? 0,
+    benchmark_p25: undefined, // Not in BenchmarkGap type
+    benchmark_p75: engineResult.benchmark?.raw_gaps?.[0]?.benchmark_p75,
+    benchmark_gap_pct: engineResult.benchmark?.raw_gaps?.[0]?.gap_vs_median_pct,
+    benchmark_gap_dollars: engineResult.benchmark?.raw_gaps?.[0]?.gap_vs_median_dollars,
+
+    yoy_it_spend_change_pct: engineResult.yoy?.it_spend_change.delta_pct,
+    yoy_it_spend_change_dollars: engineResult.yoy?.it_spend_change.delta_dollars,
+    yoy_revenue_change_pct: engineResult.yoy?.revenue_change.delta_pct,
+
+    transformation_status: fy?.transformation_status ?? undefined,
+    transformation_types: (fy?.transformation_type as string[] | null) ?? undefined,
+    transformation_spend: fy?.transformation_spend_estimate ?? undefined,
+
+    opportunities: engineResult.opportunities.map(o => ({
+      name: o.module_name,
+      annual_value_low: o.low_case,
+      annual_value_high: o.high_case,
+      timeline: '12-24 months',
+      complexity: o.confidence === 'High' ? 'Low' : o.confidence === 'Medium' ? 'Medium' : 'High',
+      status: 'Identified',
+      description: o.assumptions.join('. '),
+    })),
+    total_opportunity_low: engineResult.opportunities.reduce((s, o) => s + o.low_case, 0),
+    total_opportunity_high: engineResult.opportunities.reduce((s, o) => s + o.high_case, 0),
+
+    gap_components: engineResult.gap_attribution ? [
+      {
+        name: 'Temporary Transformation',
+        amount: engineResult.gap_attribution.temporary_transformation.dollars,
+        pct_of_gap: engineResult.gap_attribution.temporary_transformation.pct,
+        nature: 'Temporary' as const,
+        action: 'Monitor and plan for rolloff',
+      },
+      {
+        name: 'Addressable Inefficiency',
+        amount: engineResult.gap_attribution.addressable_inefficiency.dollars,
+        pct_of_gap: engineResult.gap_attribution.addressable_inefficiency.pct,
+        nature: 'Addressable' as const,
+        action: 'Target for optimization',
+      },
+      {
+        name: 'Structural Premium',
+        amount: engineResult.gap_attribution.structural_premium.dollars,
+        pct_of_gap: engineResult.gap_attribution.structural_premium.pct,
+        nature: 'Structural' as const,
+        action: 'Accept or restructure',
+      },
+    ] : undefined,
+
+    qa_flags: engineResult.qa.checks.filter(c => !c.passed).map(c => `${c.check_name}: ${c.message}`),
+    generated_narrative: engineResult.narrative.executive_summary,
+  };
+}
+
+// ── Export: Executive Summary Markdown ──
+export async function exportExecutiveSummary(analysisId: string): Promise<string | null> {
+  const engineResult = resultsCache.get(analysisId);
+  const analysis = getAnalysis(analysisId);
+  if (!engineResult || !analysis) return null;
+
+  const fy = analysis.fiscal_years[0];
+  const gaps = engineResult.benchmark?.raw_gaps ?? [];
+  const opps = engineResult.opportunities;
+
+  const lines: string[] = [];
+  lines.push(`# IT Strategy Diagnostic — Executive Summary`);
+  lines.push(`**${analysis.company.company_name}** | ${analysis.company.industry_gics_group} | ${engineResult.qualified_level}`);
+  lines.push(`*Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}*`);
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // Executive Summary
+  lines.push('## Executive Summary');
+  lines.push(engineResult.narrative.executive_summary);
+  lines.push('');
+
+  // Key Metrics
+  lines.push('## Key Metrics');
+  lines.push('| Metric | Value |');
+  lines.push('|--------|-------|');
+  Object.values(engineResult.core_kpis)
+    .filter(k => !k.suppressed)
+    .forEach(k => lines.push(`| ${k.name} | ${k.formatted} |`));
+  if (fy?.revenue) lines.push(`| Revenue | $${(fy.revenue / 1e6).toFixed(0)}M |`);
+  if (fy?.total_it_spend) lines.push(`| Total IT Spend | $${(fy.total_it_spend / 1e6).toFixed(1)}M |`);
+  if (fy?.employee_count) lines.push(`| Employees | ${fy.employee_count.toLocaleString()} |`);
+  if (fy?.it_fte_count) lines.push(`| IT FTEs | ${fy.it_fte_count} |`);
+  lines.push('');
+
+  // YoY
+  if (engineResult.yoy) {
+    lines.push('## Year-over-Year Trends');
+    lines.push(`- IT Spend Change: ${engineResult.yoy.it_spend_change.formatted_delta}`);
+    lines.push(`- Revenue Change: ${engineResult.yoy.revenue_change.formatted_delta}`);
+    lines.push(`- Comparison: ${engineResult.yoy.spend_vs_revenue_growth}`);
+    lines.push('');
+  }
+
+  // Benchmark Gaps
+  if (gaps.length > 0) {
+    lines.push('## Benchmark Comparison');
+    lines.push(`*Industry: ${engineResult.benchmark?.family.industry_gics_group}*`);
+    lines.push('');
+    lines.push('| Metric | Actual | Median | Gap |');
+    lines.push('|--------|--------|--------|-----|');
+    gaps.forEach(g => {
+      lines.push(`| ${g.metric_name.replace(/_/g, ' ')} | ${(g.actual_pct * 100).toFixed(1)}% | ${(g.benchmark_median * 100).toFixed(1)}% | ${g.gap_vs_median_pct > 0 ? '+' : ''}${(g.gap_vs_median_pct * 100).toFixed(1)}pp |`);
+    });
+    lines.push('');
+  }
+
+  // Opportunities
+  if (opps.length > 0) {
+    lines.push('## Opportunities');
+    lines.push('| Opportunity | Low | Base | High | Confidence |');
+    lines.push('|-------------|-----|------|------|------------|');
+    opps.forEach(o => {
+      lines.push(`| ${o.module_name} | $${fmtNum(o.low_case)} | $${fmtNum(o.base_case)} | $${fmtNum(o.high_case)} | ${o.confidence} |`);
+    });
+    const totalBase = opps.reduce((s, o) => s + o.base_case, 0);
+    lines.push(`| **Total** | | **$${fmtNum(totalBase)}** | | |`);
+    lines.push('');
+  }
+
+  // Key Findings
+  lines.push('## Key Findings');
+  engineResult.narrative.key_findings.forEach(f => lines.push(`- ${f}`));
+  lines.push('');
+
+  // Why It Matters
+  lines.push('## Why It Matters');
+  lines.push(engineResult.narrative.why_it_matters);
+  lines.push('');
+
+  // Caveats
+  lines.push('## Caveats & Limitations');
+  engineResult.narrative.caveats.forEach(c => lines.push(`- ${c}`));
+  lines.push('');
+
+  // QA
+  const failedChecks = engineResult.qa.checks.filter(c => !c.passed);
+  if (failedChecks.length > 0) {
+    lines.push('## Quality Flags');
+    failedChecks.forEach(c => lines.push(`- **${c.severity}**: ${c.check_name} — ${c.message}`));
+    lines.push('');
+  }
+
+  lines.push('---');
+  lines.push(`*Overall Confidence: ${engineResult.qa.overall_confidence}*`);
+  lines.push(`*${engineResult.narrative.confidence_statement}*`);
+
+  return lines.join('\n');
+}
+
+// ── Export: Full Report (structured sections) ──
+export async function exportFullReport(analysisId: string): Promise<string | null> {
+  const engineResult = resultsCache.get(analysisId);
+  const analysis = getAnalysis(analysisId);
+  if (!engineResult || !analysis) return null;
+
+  const { generateReport } = await import('@/lib/report');
+  const reportData = bridgeToReportData(engineResult, analysis);
+  const report = generateReport(reportData);
+
+  const lines: string[] = [];
+  lines.push(`# IT Strategy Diagnostic — Full Report`);
+  lines.push(`**${report.meta.company_name}** | ${report.meta.industry} | ${report.meta.qualification_level}`);
+  lines.push(`*Prepared: ${report.meta.prepared_date}*`);
+  lines.push('');
+
+  for (const section of report.sections) {
+    lines.push(`---`);
+    lines.push(`## Sheet ${section.sheet_number}: ${section.sheet_name}`);
+    lines.push(`### ${section.section_title}`);
+    lines.push('');
+
+    if (section.data && section.data.length > 0) {
+      const keys = Object.keys(section.data[0]);
+      lines.push('| ' + keys.join(' | ') + ' |');
+      lines.push('| ' + keys.map(() => '---').join(' | ') + ' |');
+      section.data.forEach(row => {
+        lines.push('| ' + keys.map(k => String(row[k] ?? '')).join(' | ') + ' |');
+      });
+      if (section.totals) {
+        lines.push('| ' + keys.map(k => `**${String(section.totals![k] ?? '')}**`).join(' | ') + ' |');
+      }
+      lines.push('');
+    }
+
+    if (section.narrative_guidance) {
+      lines.push('**Narrative Guidance:**');
+      lines.push(section.narrative_guidance);
+      lines.push('');
+    }
+
+    if (section.data_points && Object.keys(section.data_points).length > 0) {
+      lines.push('**Key Data Points:**');
+      Object.entries(section.data_points).forEach(([k, v]) => {
+        lines.push(`- ${k}: ${v}`);
+      });
+      lines.push('');
+    }
+
+    if (section.calculations && section.calculations.length > 0) {
+      lines.push('<details><summary>Calculations</summary>');
+      lines.push('');
+      section.calculations.forEach(c => lines.push(`- ${c}`));
+      lines.push('');
+      lines.push('</details>');
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
+// ── Export: Chain of Thought ──
+export async function exportChainOfThought(analysisId: string): Promise<string | null> {
+  const engineResult = resultsCache.get(analysisId);
+  const analysis = getAnalysis(analysisId);
+  if (!engineResult || !analysis) return null;
+
+  const { generateChainOfThought, formatChainOfThoughtMarkdown } = await import('@/lib/report');
+  const reportData = bridgeToReportData(engineResult, analysis);
+  const cot = generateChainOfThought(reportData);
+  return formatChainOfThoughtMarkdown(cot);
+}
+
+function fmtNum(n: number): string {
+  if (Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
+  return n.toFixed(0);
+}
