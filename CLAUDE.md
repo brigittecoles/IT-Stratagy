@@ -8,7 +8,7 @@ The primary way to run an analysis is through the **MCP server tools** — Claud
 
 ## How to Run an IT Strategy Analysis (MCP Flow)
 
-The MCP server at `mcp-server/src/index.ts` exposes 12 tools. Here is the standard workflow:
+The MCP server at `mcp-server/src/index.ts` exposes 14 tools. Here is the standard workflow:
 
 ### Step 1: Create the analysis
 Call `create_analysis` with the company name and industry:
@@ -131,6 +131,8 @@ N10 Gap Attribution → N11 Opportunity → N12 QA → N13 Narrative → N14 Out
 ### MCP Server Tools
 | Tool | Purpose |
 |------|---------|
+| `setup_guide` | Interactive setup for new users — checks Node.js, npm, port availability, provides step-by-step instructions |
+| `check_port` | Check if a localhost port is available, suggests alternatives if occupied |
 | `get_benchmarks` | Query Gartner 2026 benchmarks by industry (15 industries, P10-P90, YoY, size bands) |
 | `create_analysis` | Create a new analysis (company name + industry required) |
 | `submit_intake` | Add financial, workforce, transformation, complexity data |
@@ -146,7 +148,7 @@ N10 Gap Attribution → N11 Opportunity → N12 QA → N13 Narrative → N14 Out
 
 ## Commands
 ```bash
-npm run dev          # Start Next.js dev server (port 3000)
+npm run dev          # Start Next.js dev server (port 3456, or PORT=xxxx)
 npm run mcp          # Start MCP server on stdio
 npm run build        # Production build
 ```

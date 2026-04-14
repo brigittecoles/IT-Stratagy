@@ -11,19 +11,28 @@ Two components:
 ### Quick start
 
 ```bash
-git clone <repo-url> && cd IT-Stratagy
+git clone https://github.com/brigittecoles/IT-Stratagy.git
+cd IT-Stratagy
 npm install
 npm run dev
-# → http://localhost:3000
 ```
 
-That's it. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3456](http://localhost:3456) in your browser.
+
+### Custom port
+
+If port 3456 is already in use:
+
+```bash
+PORT=4567 npm run dev
+# → http://localhost:4567
+```
 
 ### Production build (optional)
 
 ```bash
 npm run launch
-# Builds then serves → http://localhost:3000
+# Builds + serves → http://localhost:3456
 ```
 
 ---
@@ -37,12 +46,12 @@ cd IT-Stratagy
 cd mcp-server && npm install && cd ..
 ```
 
-The `.mcp.json` in the repo root auto-configures Claude Code. Open a Claude Code session in this directory — the 12 MCP tools are immediately available.
+The `.mcp.json` in the repo root auto-configures Claude Code. Open a Claude Code session in this directory — the 14 MCP tools are immediately available.
 
 Verify:
 ```
 /mcp
-# Should show: • it-strategy-diagnostic: connected (12 tools)
+# Should show: • it-strategy-diagnostic: connected (14 tools)
 ```
 
 ### Claude Desktop setup
@@ -83,6 +92,28 @@ To publish: `cd mcp-server && npm publish`
 
 ---
 
+## Guided Setup (for non-technical users)
+
+If you're helping a teammate set up via Claude, just tell Claude:
+
+```
+Run setup_guide
+```
+
+This will automatically:
+- Check if Node.js and npm are installed
+- Verify the correct versions
+- Test if the default port is available
+- Suggest an alternative port if needed
+- Provide step-by-step terminal commands
+
+You can also check a specific port:
+```
+Run check_port with port 3456
+```
+
+---
+
 ## Running an Analysis (MCP Workflow)
 
 Once the MCP server is connected, tell Claude:
@@ -95,7 +126,7 @@ Once the MCP server is connected, tell Claude:
 5. get_chain_of_thought({ analysis_id: "...", format: "markdown" })
 ```
 
-See CLAUDE.md for the full tool reference and 12-tool workflow.
+See CLAUDE.md for the full tool reference and workflow.
 
 ---
 
@@ -106,10 +137,12 @@ See CLAUDE.md for the full tool reference and 12-tool workflow.
 | Web UI | Node.js v24+ |
 | MCP Server | Node.js v24+ |
 
-## MCP Tools Reference (12 tools)
+## MCP Tools Reference (14 tools)
 
 | Tool | Purpose |
 |------|---------|
+| `setup_guide` | Interactive setup for new users — checks prereqs, ports, provides instructions |
+| `check_port` | Check if a port is available, suggests alternatives if not |
 | `get_benchmarks` | Query Gartner 2026 benchmarks (15 industries, P10-P90) |
 | `create_analysis` | Start a new analysis |
 | `submit_intake` | Add financial, workforce, transformation data |

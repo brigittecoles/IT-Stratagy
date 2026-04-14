@@ -1715,11 +1715,224 @@ server.tool(
   }
 );
 
+// ── Tool: setup_guide ──
+server.tool(
+  'setup_guide',
+  'Interactive setup guide for non-technical users. Checks prerequisites (Node.js, npm), verifies the project is installed correctly, tests port availability, and provides step-by-step instructions. Run this FIRST when helping a new user get started.',
+  {
+    check_port: z.number().optional().describe('Port to check availability for (default: 3456)'),
+    step: z.enum(['full', 'prerequisites', 'install', 'port_check', 'start', 'troubleshoot']).optional().describe('Which setup step to run (default: full)'),
+  },
+  async ({ check_port, step }) => {
+    const port = check_port ?? 3456;
+    const requestedStep = step ?? 'full';
+    const sections: string[] = [];
+
+    // ── Prerequisites check ──
+    if (requestedStep === 'full' || requestedStep === 'prerequisites') {
+      sections.push('## ✅ Prerequisites Check\n');
+
+      // Check Node.js
+      try {
+        const { execSync } = await import('child_process');
+        const nodeVersion = execSync('node --version', { encoding: 'utf-8' }).trim();
+        const major = parseInt(nodeVersion.replace('v', '').split('.')[0]);
+        if (major >= 24) {
+          sections.push(`- ✅ **Node.js**: ${nodeVersion} (meets v24+ requirement)`);
+        } else {
+          sections.push(`- ⚠️ **Node.js**: ${nodeVersion} — v24+ is required. Please update: https://nodejs.org/`);
+        }
+      } catch {
+        sections.push('- ❌ **Node.js**: Not found. Please install from https://nodejs.org/ (v24 or later)');
+      }
+
+      // Check npm
+      try {
+        const { execSync } = await import('child_process');
+        const npmVersion = execSync('npm --version', { encoding: 'utf-8' }).trim();
+        sections.push(`- ✅ **npm**: v${npmVersion}`);
+      } catch {
+        sections.push('- ❌ **npm**: Not found. It should come bundled with Node.js.');
+      }
+
+      sections.push('');
+    }
+
+    // ── Install check ──
+    if (requestedStep === 'full' || requestedStep === 'install') {
+      sections.push('## 📦 Installation\n');
+      sections.push('Run these commands in your terminal:\n');
+      sections.push('```bash');
+      sections.push('# 1. Clone the repository (skip if already done)');
+      sections.push('git clone https://github.com/brigittecoles/IT-Stratagy.git');
+      sections.push('cd IT-Stratagy');
+      sections.push('');
+      sections.push('# 2. Install web app dependencies');
+      sections.push('npm install');
+      sections.push('');
+      sections.push('# 3. Install MCP server dependencies');
+      sections.push('cd mcp-server && npm install && cd ..');
+      sections.push('```\n');
+    }
+
+    // ── Port check ──
+    if (requestedStep === 'full' || requestedStep === 'port_check') {
+      sections.push('## 🔌 Port Availability\n');
+
+      try {
+        const net = await import('net');
+        const isAvailable = await new Promise<boolean>((resolve) => {
+          const tester = net.createServer();
+          tester.once('error', () => resolve(false));
+          tester.once('listening', () => {
+            tester.close();
+            resolve(true);
+          });
+          tester.listen(port);
+        });
+
+        if (isAvailable) {
+          sections.push(`- ✅ **Port ${port}** is available and ready to use`);
+          sections.push(`- The web UI will open at: **http://localhost:${port}**`);
+        } else {
+          sections.push(`- ⚠️ **Port ${port}** is already in use by another application`);
+          sections.push(`- **Option 1**: Close the other application using port ${port}`);
+          sections.push(`- **Option 2**: Use a different port: \`PORT=${port + 100} npm run dev\``);
+
+          // Try to find an available alternative
+          const alternatives = [3456, 3457, 3458, 4000, 4567, 5000, 8080];
+          for (const alt of alternatives) {
+            if (alt === port) continue;
+            const altAvailable = await new Promise<boolean>((resolve) => {
+              const t = net.createServer();
+              t.once('error', () => resolve(false));
+              t.once('listening', () => { t.close(); resolve(true); });
+              t.listen(alt);
+            });
+            if (altAvailable) {
+              sections.push(`- 💡 **Suggested alternative**: Port ${alt} is available → \`PORT=${alt} npm run dev\``);
+              break;
+            }
+          }
+        }
+      } catch {
+        sections.push(`- ℹ️ Could not check port ${port}. It will be tested when you start the app.`);
+      }
+
+      sections.push('');
+    }
+
+    // ── Start instructions ──
+    if (requestedStep === 'full' || requestedStep === 'start') {
+      sections.push('## 🚀 Starting the Web UI\n');
+      sections.push('From the IT-Stratagy folder, run:\n');
+      sections.push('```bash');
+      sections.push('npm run dev');
+      sections.push('```\n');
+      sections.push(`Then open your browser to: **http://localhost:${port}**\n`);
+      sections.push('To use a custom port:\n');
+      sections.push('```bash');
+      sections.push(`PORT=${port === 3456 ? 8080 : 3456} npm run dev`);
+      sections.push('```\n');
+      sections.push('To stop the server: Press **Ctrl+C** in the terminal.\n');
+    }
+
+    // ── Troubleshooting ──
+    if (requestedStep === 'full' || requestedStep === 'troubleshoot') {
+      sections.push('## 🔧 Troubleshooting\n');
+      sections.push('| Problem | Solution |');
+      sections.push('|---------|----------|');
+      sections.push('| "command not found: node" | Install Node.js v24+ from https://nodejs.org/ |');
+      sections.push('| "EACCES permission denied" | Don\'t use `sudo`. Reinstall Node.js via the official installer. |');
+      sections.push(`| "Port ${port} already in use" | Use a different port: \`PORT=4567 npm run dev\` |`);
+      sections.push('| "Module not found" | Run `npm install` in the IT-Stratagy folder |');
+      sections.push('| Page won\'t load in browser | Make sure the terminal shows "Ready" before opening the URL |');
+      sections.push('| MCP tools not connecting | Open Claude Code from inside the IT-Stratagy folder |');
+      sections.push('');
+    }
+
+    // Summary banner
+    if (requestedStep === 'full') {
+      sections.unshift('# 🏥 IT Strategy Diagnostic — Setup Guide\n');
+      sections.push('---');
+      sections.push('**Quick reference**: `cd IT-Stratagy && npm install && npm run dev` → http://localhost:' + port);
+      sections.push('');
+      sections.push('Once the web UI is running, you can also use the MCP tools right here in Claude:');
+      sections.push('1. `create_analysis` → start a new diagnostic');
+      sections.push('2. `submit_intake` → add your company data');
+      sections.push('3. `run_analysis` → generate the full diagnostic');
+      sections.push('4. `generate_report` → get the deliverable report');
+    }
+
+    return { content: [{ type: 'text' as const, text: sections.join('\n') }] };
+  }
+);
+
+// ── Tool: check_port ──
+server.tool(
+  'check_port',
+  'Check if a specific port is available on localhost. Useful before starting the web UI to avoid conflicts.',
+  {
+    port: z.number().describe('Port number to check (e.g., 3456, 3000, 8080)'),
+  },
+  async ({ port }) => {
+    try {
+      const net = await import('net');
+      const isAvailable = await new Promise<boolean>((resolve) => {
+        const tester = net.createServer();
+        tester.once('error', () => resolve(false));
+        tester.once('listening', () => {
+          tester.close();
+          resolve(true);
+        });
+        tester.listen(port);
+      });
+
+      if (isAvailable) {
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify({
+            port,
+            available: true,
+            message: `Port ${port} is available. Start the web UI with: npm run dev`,
+            url: `http://localhost:${port}`,
+          }) }],
+        };
+      }
+
+      // Find an alternative
+      const alternatives = [3456, 3457, 3458, 4000, 4567, 5000, 8080, 8888, 9000];
+      let suggestion: number | null = null;
+      for (const alt of alternatives) {
+        if (alt === port) continue;
+        const altAvailable = await new Promise<boolean>((resolve) => {
+          const t = net.createServer();
+          t.once('error', () => resolve(false));
+          t.once('listening', () => { t.close(); resolve(true); });
+          t.listen(alt);
+        });
+        if (altAvailable) { suggestion = alt; break; }
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({
+          port,
+          available: false,
+          message: `Port ${port} is in use by another application.`,
+          suggestion: suggestion ? `Use port ${suggestion} instead: PORT=${suggestion} npm run dev` : 'Try closing the other application first.',
+          suggested_port: suggestion,
+        }) }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: `Error checking port: ${err}` }] };
+    }
+  }
+);
+
 // ── Start server ──
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('IT Strategy Diagnostic MCP Server v2.1 running on stdio (15 industry benchmarks, 12 tools loaded)');
+  console.error('IT Strategy Diagnostic MCP Server v2.2 running on stdio (15 industry benchmarks, 14 tools loaded)');
 }
 
 main().catch(console.error);

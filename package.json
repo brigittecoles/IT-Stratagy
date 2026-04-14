@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node node_modules/next/dist/bin/next dev",
+    "dev": "node node_modules/next/dist/bin/next dev --port ${PORT:-3456}",
     "build": "node node_modules/next/dist/bin/next build",
-    "start": "node node_modules/next/dist/bin/next start",
-    "launch": "npm run build && node node_modules/next/dist/bin/next start --port 3000",
+    "start": "node node_modules/next/dist/bin/next start --port ${PORT:-3456}",
+    "launch": "npm run build && npm run start",
     "mcp": "cd mcp-server && npx tsx src/index.ts",
     "lint": "eslint"
   },
