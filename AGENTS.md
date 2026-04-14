@@ -17,7 +17,7 @@ cd mcp-server && npm install && cd ..
 # 2. Start the dev server (background)
 npm run dev &
 
-# 3. The app is now running at http://localhost:3456
+# 3. The app is now running at http://localhost:4321
 ```
 
 If `npm` is not available, use `bun`:

@@ -92,12 +92,12 @@ echo   [OK] Dependencies installed
 echo.
 
 REM ── Step 3: Find an available port ──
-echo Step 3: Checking port 3456...
+echo Step 3: Checking port 4321...
 
-set PORT=3456
-netstat -an | findstr ":3456 " | findstr "LISTENING" >nul 2>&1
+set PORT=4321
+netstat -an | findstr ":4321 " | findstr "LISTENING" >nul 2>&1
 if %ERRORLEVEL%==0 (
-    echo   [!!] Port 3456 is in use, trying 4567...
+    echo   [!!] Port 4321 is in use, trying 4567...
     set PORT=4567
     netstat -an | findstr ":4567 " | findstr "LISTENING" >nul 2>&1
     if %ERRORLEVEL%==0 (

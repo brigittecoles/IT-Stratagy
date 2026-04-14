@@ -1720,11 +1720,11 @@ server.tool(
   'setup_guide',
   'Interactive setup guide for non-technical users. Checks prerequisites (Node.js, npm), verifies the project is installed correctly, tests port availability, and provides step-by-step instructions. Run this FIRST when helping a new user get started.',
   {
-    check_port: z.number().optional().describe('Port to check availability for (default: 3456)'),
+    check_port: z.number().optional().describe('Port to check availability for (default: 4321)'),
     step: z.enum(['full', 'prerequisites', 'install', 'port_check', 'start', 'troubleshoot']).optional().describe('Which setup step to run (default: full)'),
   },
   async ({ check_port, step }) => {
-    const port = check_port ?? 3456;
+    const port = check_port ?? 4321;
     const requestedStep = step ?? 'full';
     const sections: string[] = [];
 
@@ -1866,7 +1866,7 @@ server.tool(
           sections.push(`- **Option 2**: Use a different port: \`PORT=${port + 100} npm run dev\``);
 
           // Try to find an available alternative
-          const alternatives = [3456, 3457, 3458, 4000, 4567, 5000, 8080];
+          const alternatives = [4321, 3457, 3458, 4000, 4567, 5000, 8080];
           for (const alt of alternatives) {
             if (alt === port) continue;
             const altAvailable = await new Promise<boolean>((resolve) => {
@@ -1903,11 +1903,11 @@ server.tool(
       sections.push('To use a custom port:\n');
       if (isWindows) {
         sections.push('```');
-        sections.push(`set PORT=${port === 3456 ? 8080 : 3456} && npm run dev`);
+        sections.push(`set PORT=${port === 4321 ? 8080 : 4321} && npm run dev`);
         sections.push('```\n');
       } else {
         sections.push('```bash');
-        sections.push(`PORT=${port === 3456 ? 8080 : 3456} npm run dev`);
+        sections.push(`PORT=${port === 4321 ? 8080 : 4321} npm run dev`);
         sections.push('```\n');
       }
       sections.push('To stop the server: Press **Ctrl+C** in the terminal.\n');
@@ -1949,7 +1949,7 @@ server.tool(
   'check_port',
   'Check if a specific port is available on localhost. Useful before starting the web UI to avoid conflicts.',
   {
-    port: z.number().describe('Port number to check (e.g., 3456, 3000, 8080)'),
+    port: z.number().describe('Port number to check (e.g., 4321, 3000, 8080)'),
   },
   async ({ port }) => {
     try {
@@ -1976,7 +1976,7 @@ server.tool(
       }
 
       // Find an alternative
-      const alternatives = [3456, 3457, 3458, 4000, 4567, 5000, 8080, 8888, 9000];
+      const alternatives = [4321, 3457, 3458, 4000, 4567, 5000, 8080, 8888, 9000];
       let suggestion: number | null = null;
       for (const alt of alternatives) {
         if (alt === port) continue;

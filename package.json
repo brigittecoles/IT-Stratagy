@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node node_modules/next/dist/bin/next dev --port ${PORT:-3456}",
+    "dev": "node node_modules/next/dist/bin/next dev --port ${PORT:-4321}",
     "build": "node node_modules/next/dist/bin/next build",
-    "start": "node node_modules/next/dist/bin/next start --port ${PORT:-3456}",
+    "start": "node node_modules/next/dist/bin/next start --port ${PORT:-4321}",
     "launch": "npm run build && npm run start",
     "mcp": "cd mcp-server && npx tsx src/index.ts",
     "lint": "eslint",

@@ -18,7 +18,7 @@ To deploy your own: click the button below, or see [Vercel Deploy](#deploy-to-ve
 
 Paste this prompt into **Claude Code**, **Codex**, or any AI coding agent:
 
-> Clone https://github.com/brigittecoles/IT-Stratagy.git, install dependencies with `npm install` in both the root and the `mcp-server/` folder, then start the dev server with `npm run dev`. Open http://localhost:3456 in my browser.
+> Clone https://github.com/brigittecoles/IT-Stratagy.git, install dependencies with `npm install` in both the root and the `mcp-server/` folder, then start the dev server with `npm run dev`. Open http://localhost:4321 in my browser.
 
 That's it. The AI handles everything.
 
@@ -41,7 +41,7 @@ cd IT-Stratagy
 npm install
 cd mcp-server && npm install && cd ..
 npm run dev
-# Open http://localhost:3456
+# Open http://localhost:4321
 ```
 
 ---

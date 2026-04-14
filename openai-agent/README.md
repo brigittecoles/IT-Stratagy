@@ -5,7 +5,7 @@ An AI agent that drives IT spending benchmark analysis conversationally using th
 ## How It Works
 
 ```
-User ←→ OpenAI Agent ←→ Local API (localhost:3456) ←→ Analysis Engine
+User ←→ OpenAI Agent ←→ Local API (localhost:4321) ←→ Analysis Engine
 ```
 
 The agent calls your locally-running web app's API to create analyses, submit data, run benchmarks, and retrieve results. The user interacts conversationally — no forms needed.
@@ -16,7 +16,7 @@ The agent calls your locally-running web app's API to create analyses, submit da
 ```bash
 cd IT-Stratagy
 npm run dev
-# Running at http://localhost:3456
+# Running at http://localhost:4321
 ```
 
 ### 2. Install the agent (in another terminal)
@@ -40,7 +40,7 @@ python agent.py
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OPENAI_API_KEY` | (required) | Your OpenAI API key |
-| `IT_STRATEGY_API_URL` | `http://localhost:3456` | API base URL (change if using Vercel) |
+| `IT_STRATEGY_API_URL` | `http://localhost:4321` | API base URL (change if using Vercel) |
 
 ## Using with Vercel (hosted)
 

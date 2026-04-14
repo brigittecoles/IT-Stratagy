@@ -12,7 +12,7 @@ Or deploy your own in 30 seconds: [![Deploy with Vercel](https://vercel.com/butt
 
 Paste this into **Claude Code**, **Codex**, or any AI coding agent:
 
-> Clone https://github.com/brigittecoles/IT-Stratagy.git, install dependencies with `npm install` in both the root and the `mcp-server/` folder, then start the dev server with `npm run dev`. Open http://localhost:3456 in my browser.
+> Clone https://github.com/brigittecoles/IT-Stratagy.git, install dependencies with `npm install` in both the root and the `mcp-server/` folder, then start the dev server with `npm run dev`. Open http://localhost:4321 in my browser.
 
 The AI does everything. You never touch a terminal.
 
@@ -46,7 +46,7 @@ cd IT-Stratagy
 npm install
 cd mcp-server && npm install && cd ..
 npm run dev
-# → http://localhost:3456
+# → http://localhost:4321
 ```
 
 ### With Bun:
@@ -56,7 +56,7 @@ cd IT-Stratagy
 bun install
 cd mcp-server && bun install && cd ..
 bun run dev
-# → http://localhost:3456
+# → http://localhost:4321
 ```
 
 ### Don't have npm or Bun?

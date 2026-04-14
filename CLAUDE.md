@@ -148,7 +148,7 @@ N10 Gap Attribution → N11 Opportunity → N12 QA → N13 Narrative → N14 Out
 
 ## Commands
 ```bash
-npm run dev          # Start Next.js dev server (port 3456, or PORT=xxxx)
+npm run dev          # Start Next.js dev server (port 4321, or PORT=xxxx)
 npm run mcp          # Start MCP server on stdio
 npm run build        # Production build
 ```

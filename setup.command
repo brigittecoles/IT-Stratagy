@@ -103,8 +103,8 @@ echo ""
 # ── Step 3: Find an available port ──
 echo -e "${BOLD}Step 3: Finding an available port...${NC}"
 
-PORT=3456
-for TRY_PORT in 3456 3457 3458 4000 4567 5000 8080; do
+PORT=4321
+for TRY_PORT in 4321 3457 3458 4000 4567 5000 8080; do
     if ! lsof -i ":$TRY_PORT" &> /dev/null; then
         PORT=$TRY_PORT
         break
