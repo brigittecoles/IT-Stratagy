@@ -1732,27 +1732,58 @@ server.tool(
     if (requestedStep === 'full' || requestedStep === 'prerequisites') {
       sections.push('## ✅ Prerequisites Check\n');
 
+      let hasNode = false;
+      let hasBun = false;
+
       // Check Node.js
       try {
         const { execSync } = await import('child_process');
         const nodeVersion = execSync('node --version', { encoding: 'utf-8' }).trim();
         const major = parseInt(nodeVersion.replace('v', '').split('.')[0]);
+        hasNode = true;
         if (major >= 24) {
           sections.push(`- ✅ **Node.js**: ${nodeVersion} (meets v24+ requirement)`);
         } else {
-          sections.push(`- ⚠️ **Node.js**: ${nodeVersion} — v24+ is required. Please update: https://nodejs.org/`);
+          sections.push(`- ⚠️ **Node.js**: ${nodeVersion} — v24+ is recommended. Consider updating: https://nodejs.org/`);
         }
       } catch {
-        sections.push('- ❌ **Node.js**: Not found. Please install from https://nodejs.org/ (v24 or later)');
+        sections.push('- ℹ️ **Node.js**: Not installed');
       }
 
       // Check npm
+      if (hasNode) {
+        try {
+          const { execSync } = await import('child_process');
+          const npmVersion = execSync('npm --version', { encoding: 'utf-8' }).trim();
+          sections.push(`- ✅ **npm**: v${npmVersion}`);
+        } catch {
+          sections.push('- ⚠️ **npm**: Not found (should come with Node.js)');
+        }
+      }
+
+      // Check Bun
       try {
         const { execSync } = await import('child_process');
-        const npmVersion = execSync('npm --version', { encoding: 'utf-8' }).trim();
-        sections.push(`- ✅ **npm**: v${npmVersion}`);
+        const bunVersion = execSync('bun --version', { encoding: 'utf-8' }).trim();
+        hasBun = true;
+        sections.push(`- ✅ **Bun**: v${bunVersion} (fast alternative to npm)`);
       } catch {
-        sections.push('- ❌ **npm**: Not found. It should come bundled with Node.js.');
+        // Bun not found — only note if Node is also missing
+      }
+
+      if (!hasNode && !hasBun) {
+        sections.push('');
+        sections.push('⚠️ **No JavaScript runtime found.** You have two options:\n');
+        sections.push('**Option A — Easiest (double-click setup):**');
+        sections.push('In Finder, navigate to the IT-Stratagy folder and double-click `setup.command`.');
+        sections.push('This will automatically install Bun (no admin required) and start everything.\n');
+        sections.push('**Option B — Install Bun manually (one terminal command):**');
+        sections.push('```bash');
+        sections.push('curl -fsSL https://bun.sh/install | bash');
+        sections.push('```');
+        sections.push('Then restart your terminal and come back.\n');
+        sections.push('**Option C — Install Node.js:**');
+        sections.push('Download from https://nodejs.org/ (v24 or later)');
       }
 
       sections.push('');
@@ -1760,19 +1791,54 @@ server.tool(
 
     // ── Install check ──
     if (requestedStep === 'full' || requestedStep === 'install') {
+      // Detect OS
+      const isWindows = process.platform === 'win32';
+
       sections.push('## 📦 Installation\n');
-      sections.push('Run these commands in your terminal:\n');
-      sections.push('```bash');
-      sections.push('# 1. Clone the repository (skip if already done)');
-      sections.push('git clone https://github.com/brigittecoles/IT-Stratagy.git');
-      sections.push('cd IT-Stratagy');
-      sections.push('');
-      sections.push('# 2. Install web app dependencies');
-      sections.push('npm install');
-      sections.push('');
-      sections.push('# 3. Install MCP server dependencies');
-      sections.push('cd mcp-server && npm install && cd ..');
-      sections.push('```\n');
+      sections.push('### Easiest: Double-click setup\n');
+      if (isWindows) {
+        sections.push('In File Explorer, navigate to the IT-Stratagy folder and **double-click `setup.bat`**.');
+        sections.push('This will install everything automatically and open the app in your browser.\n');
+      } else {
+        sections.push('In Finder, navigate to the IT-Stratagy folder and **double-click `setup.command`**.');
+        sections.push('This will install everything automatically and open the app in your browser.\n');
+      }
+
+      sections.push('### Manual setup (terminal)\n');
+
+      if (isWindows) {
+        sections.push('Open **Command Prompt** or **PowerShell** and run:\n');
+        sections.push('```');
+        sections.push('git clone https://github.com/brigittecoles/IT-Stratagy.git');
+        sections.push('cd IT-Stratagy');
+        sections.push('');
+        sections.push('REM If you have npm:');
+        sections.push('npm install');
+        sections.push('cd mcp-server && npm install && cd ..');
+        sections.push('npm run dev');
+        sections.push('');
+        sections.push('REM If you have Bun instead:');
+        sections.push('bun install');
+        sections.push('cd mcp-server && bun install && cd ..');
+        sections.push('bun run dev');
+        sections.push('```\n');
+      } else {
+        sections.push('Open **Terminal** and run:\n');
+        sections.push('```bash');
+        sections.push('git clone https://github.com/brigittecoles/IT-Stratagy.git');
+        sections.push('cd IT-Stratagy');
+        sections.push('');
+        sections.push('# If you have npm:');
+        sections.push('npm install && cd mcp-server && npm install && cd ..');
+        sections.push('npm run dev');
+        sections.push('');
+        sections.push('# If you have Bun instead:');
+        sections.push('bun install && cd mcp-server && bun install && cd ..');
+        sections.push('bun run dev');
+        sections.push('```\n');
+      }
+
+      sections.push('> **Don\'t have npm or Bun?** The double-click setup files above will install Bun for you automatically — no admin access needed.\n');
     }
 
     // ── Port check ──
@@ -1824,16 +1890,26 @@ server.tool(
 
     // ── Start instructions ──
     if (requestedStep === 'full' || requestedStep === 'start') {
+      const isWindows = process.platform === 'win32';
+
       sections.push('## 🚀 Starting the Web UI\n');
-      sections.push('From the IT-Stratagy folder, run:\n');
-      sections.push('```bash');
-      sections.push('npm run dev');
+      sections.push('**Easiest way**: Double-click `setup.command` (Mac) or `setup.bat` (Windows) in the IT-Stratagy folder.\n');
+      sections.push('**Or from the terminal**, in the IT-Stratagy folder:\n');
+      sections.push('```');
+      sections.push('npm run dev        # if you have npm');
+      sections.push('bun run dev        # if you have Bun');
       sections.push('```\n');
       sections.push(`Then open your browser to: **http://localhost:${port}**\n`);
       sections.push('To use a custom port:\n');
-      sections.push('```bash');
-      sections.push(`PORT=${port === 3456 ? 8080 : 3456} npm run dev`);
-      sections.push('```\n');
+      if (isWindows) {
+        sections.push('```');
+        sections.push(`set PORT=${port === 3456 ? 8080 : 3456} && npm run dev`);
+        sections.push('```\n');
+      } else {
+        sections.push('```bash');
+        sections.push(`PORT=${port === 3456 ? 8080 : 3456} npm run dev`);
+        sections.push('```\n');
+      }
       sections.push('To stop the server: Press **Ctrl+C** in the terminal.\n');
     }
 

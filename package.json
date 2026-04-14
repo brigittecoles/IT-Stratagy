@@ -8,7 +8,8 @@
     "start": "node node_modules/next/dist/bin/next start --port ${PORT:-3456}",
     "launch": "npm run build && npm run start",
     "mcp": "cd mcp-server && npx tsx src/index.ts",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "bash setup.command"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
