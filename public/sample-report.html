@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Spend Analysis Report — West Monroe</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   WEST MONROE DESIGN SYSTEM — TOKEN MAP
+═══════════════════════════════════════════════════════ */
+:root {
+  --navy-900:#020012;--navy-800:#040029;--navy-700:#070154;--navy-600:#0A0275;
+  --navy-400:#3333AB;--navy-200:#9999D5;--navy-100:#CCCCEB;--navy-50:#E8E8F5;
+  --blue-700:#002967;--blue-600:#0037B8;--blue-500:#0047FF;--blue-400:#3370FF;
+  --blue-100:#CCDDFF;--blue-50:#E6EEFF;
+  --cyan-500:#00E8FA;
+  --magenta-600:#C700AA;--magenta-500:#F900D3;--magenta-100:#FECCF6;--magenta-50:#FEE6FB;
+  --green-500:#1DD566;--green-100:#D2F6E0;
+  --gold-500:#FFC700;--gold-100:#FFF4CC;
+  --orange-500:#FF8A00;--red-500:#F52C00;--red-100:#FDBFB8;
+  --slate-700:#3A4A68;--slate-600:#50658E;--slate-500:#6B7EA5;--slate-400:#8A9BBB;
+  --slate-300:#97A4BA;--slate-200:#CED7E6;--slate-100:#E8EEF8;--slate-50:#F4F7FC;
+  --brand-primary:#070154;--brand-secondary:#0047FF;--brand-accent:#F900D3;
+  --text-primary:#070154;--text-secondary:#50658E;--text-tertiary:#97A4BA;
+  --text-inverse:#FFFFFF;--bg-page:#FFFFFF;--bg-elevated:#F4F7FC;
+  --bg-subtle:#E8EEF8;--bg-inverse:#070154;
+  --border-default:#CED7E6;--border-subtle:#E8EEF8;
+  --status-success:#1DD566;--status-warning:#FFC700;--status-error:#F52C00;
+  --font:Arial,Helvetica,sans-serif;--font-mono:'Courier New',Courier,monospace;
+  --dur-fast:100ms;--dur-normal:200ms;--dur-slow:400ms;
+  --ease:cubic-bezier(0.25,0.1,0.25,1);--ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --shadow-sm:0 1px 3px rgba(7,1,84,0.08);--shadow-md:0 4px 12px rgba(7,1,84,0.10);
+  --shadow-lg:0 8px 24px rgba(7,1,84,0.12);--shadow-xl:0 16px 48px rgba(7,1,84,0.16);
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);font-size:1rem;line-height:1.5;color:var(--text-primary);background:var(--bg-page);overflow-x:hidden}
+
+/* ── TOPBAR ── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--navy-700);display:flex;align-items:center;height:56px;padding:0 24px;box-shadow:var(--shadow-lg)}
+.wm-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.wm-logo-mark{width:32px;height:32px;background:var(--blue-500);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;letter-spacing:-1px}
+.wm-logo-text{color:#fff;font-size:0.875rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase}
+.nav-divider{width:1px;height:28px;background:rgba(255,255,255,0.15);margin:0 20px}
+#nav-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
+#nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:6px 14px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:rgba(255,255,255,0.6);border:none;background:transparent;cursor:pointer;border-radius:var(--r-sm);white-space:nowrap;transition:all var(--dur-normal) var(--ease);position:relative}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-tab.active{color:#fff;background:var(--blue-500)}
+.nav-tab.active::after{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:var(--magenta-500);border-radius:50%}
+
+/* ── LAYOUT ── */
+main{padding-top:56px}
+.section{display:none}
+.section.active{display:block}
+
+/* ── COVER ── */
+#cover-section{background:var(--navy-700);min-height:calc(100vh - 56px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cover-grid-bg{position:absolute;inset:0;background-image:radial-gradient(circle at 20% 80%,rgba(0,71,255,0.12) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(249,0,211,0.10) 0%,transparent 50%),linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:auto,auto,40px 40px,40px 40px;pointer-events:none}
+.cover-inner{position:relative;z-index:1;padding:80px 80px 64px;flex:1;display:flex;flex-direction:column;justify-content:center;max-width:900px}
+.cover-eyebrow{font-size:0.6875rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--magenta-500);margin-bottom:20px;font-family:var(--font-mono)}
+.cover-title{font-size:3.5rem;font-weight:700;line-height:1.1;color:#fff;letter-spacing:-0.02em;margin-bottom:24px}
+.cover-title span{color:var(--cyan-500)}
+.cover-subtitle{font-size:1.125rem;color:rgba(255,255,255,0.65);margin-bottom:48px;max-width:560px;line-height:1.6}
+.cover-stats{display:flex;gap:48px;margin-bottom:56px;flex-wrap:wrap}
+.cover-stat{border-left:3px solid var(--magenta-500);padding-left:16px}
+.cover-stat-val{font-size:2rem;font-weight:700;color:var(--magenta-500);line-height:1}
+.cover-stat-label{font-size:0.75rem;color:rgba(255,255,255,0.55);margin-top:4px;letter-spacing:0.04em;text-transform:uppercase}
+.cover-tags{display:flex;gap:10px;flex-wrap:wrap}
+.cover-tag{padding:6px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--r-full);font-size:0.75rem;color:rgba(255,255,255,0.7)}
+.cover-bottom-bar{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.08);padding:20px 80px;display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.4)}
+.cover-bottom-bar strong{color:rgba(255,255,255,0.7)}
+
+/* ── PAGE INNER ── */
+.page-inner{max-width:1200px;margin:0 auto;padding:56px 48px}
+.chapter-header{background:var(--navy-700);padding:48px 48px 40px;position:relative;overflow:hidden}
+.chapter-header::after{content:'';position:absolute;right:-60px;top:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(0,71,255,0.15) 0%,transparent 70%);pointer-events:none}
+.chapter-eyebrow{font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--magenta-500);margin-bottom:10px}
+.chapter-title{font-size:2rem;font-weight:700;color:#fff;line-height:1.2;max-width:700px}
+.chapter-desc{margin-top:12px;font-size:0.9375rem;color:rgba(255,255,255,0.6);max-width:600px}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:40px}
+.kpi-card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-sm);transition:box-shadow var(--dur-normal) var(--ease),transform var(--dur-normal) var(--ease);position:relative;overflow:hidden}
+.kpi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--magenta-500)}
+.kpi-card.blue::before{background:var(--blue-500)}.kpi-card.green::before{background:var(--green-500)}.kpi-card.gold::before{background:var(--gold-500)}.kpi-card.red::before{background:var(--red-500)}.kpi-card.slate::before{background:var(--slate-300)}
+.kpi-eyebrow{font-family:var(--font-mono);font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px}
+.kpi-val{font-size:2rem;font-weight:700;color:var(--magenta-500);line-height:1;margin-bottom:4px}
+.kpi-card.blue .kpi-val{color:var(--blue-500)}.kpi-card.green .kpi-val{color:var(--green-500)}.kpi-card.gold .kpi-val{color:var(--gold-500)}.kpi-card.red .kpi-val{color:var(--red-500)}.kpi-card.slate .kpi-val{color:var(--slate-400)}
+.kpi-label{font-size:0.8125rem;color:var(--text-secondary);font-weight:700;margin-bottom:8px}
+.kpi-delta{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-full);font-size:0.75rem;font-weight:700}
+.kpi-delta.neg{background:var(--red-100);color:var(--red-500)}
+.kpi-delta.pos{background:var(--green-100);color:var(--status-success)}
+.kpi-delta.neutral{background:var(--slate-100);color:var(--slate-600)}
+.kpi-delta.warn{background:var(--gold-100);color:#7a5c00}
+.kpi-delta.info{background:var(--blue-50);color:var(--blue-600)}
+
+/* ── CONTENT CARDS ── */
+.card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:28px;box-shadow:var(--shadow-sm);margin-bottom:24px}
+.card.accent-left{border-left:4px solid var(--magenta-500)}
+.card.accent-left.blue{border-left-color:var(--blue-500)}
+.card.navy-bg{background:var(--navy-700);border-color:transparent;color:#fff}
+.card-overline{font-family:var(--font-mono);font-size:0.625rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--magenta-500);margin-bottom:8px}
+.card.navy-bg .card-overline{color:var(--cyan-500)}
+.card-title{font-size:1.125rem;font-weight:700;color:var(--text-primary);margin-bottom:12px}
+.card.navy-bg .card-title{color:#fff}
+.card-body{font-size:0.9375rem;color:var(--text-secondary);line-height:1.65}
+.card.navy-bg .card-body{color:rgba(255,255,255,0.75)}
+
+/* ── PLACEHOLDER CARD ── */
+.placeholder-card{background:var(--bg-elevated);border:2px dashed var(--border-default);border-radius:var(--r-lg);padding:24px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.placeholder-icon{width:36px;height:36px;border-radius:var(--r-md);background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.placeholder-text{font-size:0.875rem;color:var(--text-tertiary);line-height:1.5}
+.placeholder-text strong{color:var(--text-secondary);display:block;margin-bottom:2px}
+
+/* ── GRIDS ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+.two-third{display:grid;grid-template-columns:2fr 1fr;gap:24px}
+@media(max-width:900px){.two-col,.three-col,.two-third{grid-template-columns:1fr}}
+
+/* ── CHARTS ── */
+.chart-wrap{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:28px;box-shadow:var(--shadow-sm);margin-bottom:24px}
+.chart-wrap canvas{display:block;max-height:320px}
+.chart-title{font-size:0.875rem;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.chart-subtitle{font-size:0.75rem;color:var(--text-tertiary);margin-bottom:20px;font-family:var(--font-mono);letter-spacing:0.04em}
+
+/* ── TABLES ── */
+.data-table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border-subtle);box-shadow:var(--shadow-sm);margin-bottom:24px}
+.data-table{width:100%;border-collapse:collapse;font-size:0.875rem}
+.data-table thead tr{background:var(--navy-700)}
+.data-table thead th{padding:12px 16px;text-align:left;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.8);white-space:nowrap}
+.data-table tbody tr{border-bottom:1px solid var(--border-subtle);transition:background var(--dur-fast) var(--ease)}
+.data-table tbody tr:hover{background:var(--bg-elevated)}
+.data-table tbody tr:last-child{border-bottom:none}
+.data-table td{padding:12px 16px;color:var(--text-secondary)}
+.data-table td:first-child{color:var(--text-primary);font-weight:700}
+.data-table tfoot tr{background:var(--bg-elevated);border-top:2px solid var(--border-default)}
+.data-table tfoot td{padding:12px 16px;font-weight:700;color:var(--text-primary);font-size:0.875rem}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:var(--r-full);font-size:0.6875rem;font-weight:700;white-space:nowrap}
+.badge.green{background:var(--green-100);color:#0a6632}
+.badge.gold{background:var(--gold-100);color:#7a5c00}
+.badge.red{background:var(--red-100);color:#8c1200}
+.badge.blue{background:var(--blue-50);color:var(--blue-600)}
+.badge.magenta{background:var(--magenta-50);color:var(--magenta-600)}
+.badge.slate{background:var(--slate-100);color:var(--slate-700)}
+
+/* ── GAP BAR ── */
+.gap-bar-track{height:36px;border-radius:var(--r-md);overflow:hidden;display:flex;margin-bottom:12px;background:var(--bg-subtle)}
+.gap-seg{display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;cursor:default;position:relative}
+.gap-seg span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+.gap-legend{display:flex;gap:20px;flex-wrap:wrap}
+.gap-legend-item{display:flex;align-items:center;gap:8px;font-size:0.8125rem}
+.gap-legend-dot{width:12px;height:12px;border-radius:3px}
+
+/* ── RECOMMENDATIONS ── */
+.rec-card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:0;box-shadow:var(--shadow-sm);margin-bottom:16px;overflow:hidden;transition:box-shadow var(--dur-normal) var(--ease)}
+.rec-card:hover{box-shadow:var(--shadow-md)}
+.rec-header{display:flex;align-items:flex-start;padding:20px 24px;cursor:pointer;gap:16px;border-bottom:1px solid transparent;transition:border-color var(--dur-fast)}
+.rec-header.open{border-color:var(--border-subtle)}
+.rec-num{width:40px;height:40px;flex-shrink:0;background:var(--navy-700);color:var(--magenta-500);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:1.125rem;font-weight:700}
+.rec-meta{flex:1}
+.rec-priority{font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--magenta-500);margin-bottom:4px}
+.rec-name{font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.rec-desc{font-size:0.8125rem;color:var(--text-secondary)}
+.rec-badges{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.rec-chevron{width:24px;height:24px;flex-shrink:0;color:var(--text-tertiary);transition:transform var(--dur-normal) var(--ease);display:flex;align-items:center;justify-content:center}
+.rec-chevron.open{transform:rotate(180deg)}
+.rec-body{padding:0 24px;max-height:0;overflow:hidden;transition:max-height var(--dur-slow) var(--ease),padding var(--dur-slow) var(--ease)}
+.rec-body.open{max-height:1200px;padding:20px 24px 24px}
+.rec-section-title{font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue-500);margin-bottom:8px;margin-top:16px}
+.rec-section-title:first-child{margin-top:0}
+.rec-text{font-size:0.875rem;color:var(--text-secondary);line-height:1.65}
+.action-list{list-style:none;margin-top:8px}
+.action-list li{display:flex;align-items:flex-start;gap:8px;font-size:0.875rem;color:var(--text-secondary);padding:4px 0;line-height:1.5}
+.action-list li::before{content:'→';color:var(--blue-500);font-weight:700;flex-shrink:0;margin-top:1px}
+
+/* ── TOWER BARS ── */
+.tower-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:24px}
+.tower-row{display:grid;grid-template-columns:220px 1fr 120px;gap:12px;align-items:center}
+.tower-label{color:var(--text-primary);font-weight:700;font-size:0.8125rem}
+.tower-bar-track{height:20px;background:var(--bg-subtle);border-radius:var(--r-full);overflow:hidden}
+.tower-bar-fill{height:100%;border-radius:var(--r-full);background:var(--blue-500);transition:width 1s var(--ease)}
+.tower-bar-fill.over{background:var(--magenta-500)}
+.tower-bar-fill.ok{background:var(--green-500)}
+.tower-pct{font-size:0.8125rem;font-weight:700;color:var(--text-secondary);text-align:right}
+
+/* ── MILESTONE TIMELINE ── */
+.outlook-milestones{display:flex;gap:0;margin:24px 0 32px;position:relative}
+.outlook-milestones::before{content:'';position:absolute;top:36px;left:40px;right:40px;height:2px;background:linear-gradient(90deg,var(--red-500),var(--gold-500),var(--green-500));z-index:0}
+.milestone{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;padding:0 8px}
+.milestone-dot{width:28px;height:28px;border-radius:50%;background:var(--navy-700);border:3px solid var(--red-500);display:flex;align-items:center;justify-content:center;font-size:0.625rem;font-weight:700;color:#fff;margin-bottom:10px}
+.milestone:nth-child(2) .milestone-dot{border-color:var(--gold-500)}
+.milestone:nth-child(3) .milestone-dot{border-color:var(--green-500)}
+.milestone-year{font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--text-tertiary);margin-bottom:4px;text-align:center}
+.milestone-val{font-size:1.25rem;font-weight:700;color:var(--text-primary);text-align:center}
+.milestone-sub{font-size:0.6875rem;color:var(--text-tertiary);text-align:center;margin-top:2px}
+
+/* ── BOTTOM LINE CALLOUT ── */
+.bottom-line-callout{background:linear-gradient(135deg,var(--navy-700) 0%,var(--navy-600) 100%);border-radius:var(--r-lg);padding:36px;position:relative;overflow:hidden;margin-top:40px}
+.bottom-line-callout::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.bottom-line-callout .card-overline,.bottom-line-callout .card-title,.bottom-line-callout .card-body{position:relative;z-index:1}
+.bottom-line-callout .card-title{font-size:1.375rem;color:#fff;margin-bottom:16px}
+.bottom-line-callout .card-body{color:rgba(255,255,255,0.75);font-size:0.9375rem}
+.highlight{color:var(--magenta-500);font-weight:700}
+
+/* ── APPENDIX ── */
+.appendix-section{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden}
+.appendix-header{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--bg-elevated);font-weight:700;font-size:0.875rem;color:var(--text-primary);transition:background var(--dur-fast)}
+.appendix-header:hover{background:var(--bg-subtle)}
+.appendix-body{padding:0 24px;max-height:0;overflow:hidden;transition:max-height var(--dur-slow) var(--ease),padding var(--dur-slow) var(--ease);font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
+.appendix-body.open{max-height:2000px;padding:20px 24px 24px}
+
+/* ── DIVIDER ── */
+.section-divider{display:flex;align-items:center;gap:12px;margin:40px 0 28px}
+.section-divider-line{flex:1;height:1px;background:var(--border-default)}
+.section-divider-label{font-family:var(--font-mono);font-size:0.625rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary);flex-shrink:0}
+.section-divider-dot{width:6px;height:6px;border-radius:50%;background:var(--magenta-500);flex-shrink:0}
+
+/* ── FOOTER ── */
+.report-footer{border-top:1px solid var(--border-default);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;color:var(--text-tertiary);background:var(--bg-elevated)}
+
+/* ── UTILS ── */
+.mt-4{margin-top:16px}.mt-6{margin-top:24px}.mb-4{margin-bottom:16px}
+.text-sm{font-size:0.875rem}.text-xs{font-size:0.75rem}.text-mono{font-family:var(--font-mono)}
+.text-accent{color:var(--magenta-500)}.text-blue{color:var(--blue-500)}.text-secondary{color:var(--text-secondary)}
+.font-bold{font-weight:700}.flex{display:flex}.gap-3{gap:12px}.items-center{align-items:center}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp 0.5s var(--ease) forwards}
+.fade-up-d1{animation-delay:.1s;opacity:0}.fade-up-d2{animation-delay:.2s;opacity:0}
+.fade-up-d3{animation-delay:.3s;opacity:0}.fade-up-d4{animation-delay:.4s;opacity:0}
+.fade-up-d5{animation-delay:.5s;opacity:0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     ██████  CONFIG — EDIT THIS BLOCK TO POPULATE THE REPORT
+     ═══════════════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+
+  // ── IDENTITY ─────────────────────────────────────────
+  company:       "[COMPANY NAME]",
+  period:        "[FISCAL YEAR]",          // e.g. "FY2025"
+  periodPrior:   "[PRIOR FISCAL YEAR]",    // e.g. "FY2024"
+  preparedDate:  "[MONTH YYYY]",           // e.g. "April 2025"
+  industry:      "[INDUSTRY / SECTOR]",    // e.g. "Financial Services"
+
+  // ── COVER TAGS (add/remove as needed) ────────────────
+  tags: [
+    "[Period] Analysis",
+    "IT Benchmarking",
+    "Gap Decomposition",
+    "Transformation Roadmap",
+    "8-Tower Framework",
+    "Value Creation"
+  ],
+
+  // ── FINANCIALS ───────────────────────────────────────
+  revenue:          "[REVENUE]",           // e.g. "$503.0M"
+  revenueRaw:       0,                     // numeric, in $M — used for charts
+  revenuePrior:     "[PRIOR REVENUE]",
+  revenuePriorRaw:  0,
+
+  itSpend:          "[TOTAL IT SPEND]",    // e.g. "$18.4M"
+  itSpendRaw:       0,
+  itSpendPrior:     "[PRIOR IT SPEND]",
+  itSpendPriorRaw:  0,
+
+  itOpex:           "[IT OPEX]",
+  itOpexRaw:        0,
+  itOpexPrior:      "[PRIOR IT OPEX]",
+  itOpexPriorRaw:   0,
+
+  itCapex:          "[IT CAPEX]",
+  itCapexRaw:       0,
+  itCapexPrior:     "[PRIOR IT CAPEX]",
+  itCapexPriorRaw:  0,
+
+  itPctRev:         "[IT % OF REVENUE]",   // e.g. "3.65%"
+  itPctRevRaw:      0,                     // numeric, e.g. 3.65
+  itPctRevPrior:    "[PRIOR IT % OF REV]",
+  itPctRevPriorRaw: 0,
+
+  // ── BENCHMARK ────────────────────────────────────────
+  bmMedianPct:      "[PEER MEDIAN %]",     // e.g. "2.36%"
+  bmMedianPctRaw:   0,
+  bmMedianDollar:   "[PEER MEDIAN $]",     // e.g. "$11.9M"
+  bmTopQuartilePct: "[TOP QUARTILE %]",
+  bmTopQuartileRaw: 0,
+  bm75thPct:        "[75TH PERCENTILE %]",
+  bm75thRaw:        0,
+  gapDollar:        "[GAP TO MEDIAN $]",   // e.g. "+$6.5M"
+  gapPP:            "[GAP TO MEDIAN pp]",  // e.g. "+1.29pp"
+
+  // ── GAP DECOMPOSITION (must sum to 100) ──────────────
+  gapTemporaryPct:    0,     // e.g. 70
+  gapTemporaryDollar: "[TEMPORARY $]",
+  gapAddressablePct:  0,     // e.g. 23
+  gapAddressableDollar: "[ADDRESSABLE $]",
+  gapStructuralPct:   0,     // e.g. 8  (= 100 - temporary - addressable)
+  gapStructuralDollar: "[STRUCTURAL $]",
+
+  // ── VALUE OPPORTUNITY ────────────────────────────────
+  valueTotal:  "[VALUE TOTAL]",            // e.g. "$15–24M"
+  valueLow:    0,                          // numeric low end $M
+  valueHigh:   0,                          // numeric high end $M
+
+  // ── TOP 5 RECOMMENDATIONS ────────────────────────────
+  // Each: { title, tagline, annualValue, timeline, complexity, status, issue, opportunity, actions[] }
+  recommendations: [
+    {
+      title:       "[PRIORITY #1 NAME]",
+      tagline:     "[One-sentence description of the priority and the value it captures.]",
+      annualValue: "[VALUE RANGE]",
+      timeline:    "[TIMELINE]",
+      complexity:  "[Low / Medium / High]",
+      complexityColor: "green",           // green | gold | red
+      status:      "[STATUS]",
+      statusColor: "green",
+      issue:       "[Describe the current issue. What is happening, what metric shows it, and why does it matter now?]",
+      opportunity: "[Describe the opportunity. What can be improved, how, and what value could be created?]",
+      actions:     [
+        "[Action 1]",
+        "[Action 2]",
+        "[Action 3]",
+        "[Action 4]",
+        "[Action 5]"
+      ]
+    },
+    {
+      title:       "[PRIORITY #2 NAME]",
+      tagline:     "[One-sentence description of the priority and the value it captures.]",
+      annualValue: "[VALUE RANGE]",
+      timeline:    "[TIMELINE]",
+      complexity:  "[Low / Medium / High]",
+      complexityColor: "gold",
+      status:      "[STATUS]",
+      statusColor: "blue",
+      issue:       "[Describe the current issue.]",
+      opportunity: "[Describe the opportunity.]",
+      actions:     ["[Action 1]","[Action 2]","[Action 3]","[Action 4]","[Action 5]"]
+    },
+    {
+      title:       "[PRIORITY #3 NAME]",
+      tagline:     "[One-sentence description.]",
+      annualValue: "[VALUE RANGE]",
+      timeline:    "[TIMELINE]",
+      complexity:  "[Low / Medium / High]",
+      complexityColor: "gold",
+      status:      "[STATUS]",
+      statusColor: "gold",
+      issue:       "[Describe the current issue.]",
+      opportunity: "[Describe the opportunity.]",
+      actions:     ["[Action 1]","[Action 2]","[Action 3]","[Action 4]","[Action 5]"]
+    },
+    {
+      title:       "[PRIORITY #4 NAME]",
+      tagline:     "[One-sentence description.]",
+      annualValue: "[VALUE RANGE]",
+      timeline:    "[TIMELINE]",
+      complexity:  "[Low / Medium / High]",
+      complexityColor: "gold",
+      status:      "[STATUS]",
+      statusColor: "slate",
+      issue:       "[Describe the current issue.]",
+      opportunity: "[Describe the opportunity.]",
+      actions:     ["[Action 1]","[Action 2]","[Action 3]","[Action 4]"]
+    },
+    {
+      title:       "[PRIORITY #5 NAME]",
+      tagline:     "[One-sentence description.]",
+      annualValue: "[VALUE RANGE]",
+      timeline:    "[TIMELINE]",
+      complexity:  "[Low / Medium / High]",
+      complexityColor: "green",
+      status:      "[STATUS]",
+      statusColor: "green",
+      issue:       "[Describe the current issue.]",
+      opportunity: "[Describe the opportunity.]",
+      actions:     ["[Action 1]","[Action 2]","[Action 3]","[Action 4]"]
+    }
+  ],
+
+  // ── TOWER DATA ────────────────────────────────────────
+  // Each: { name, opex, capex, total, pctRev, bmPct }
+  // pctRev/bmPct are numeric (e.g. 0.89 = 0.89%)
+  towers: [
+    { name:"Infrastructure & Operations",          opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.72 },
+    { name:"Enterprise Applications (ERP/CRM)",    opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.65 },
+    { name:"App Dev & Maintenance",                opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.38 },
+    { name:"Security & Compliance",                opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.30 },
+    { name:"Data & Analytics",                     opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.18 },
+    { name:"End-User Services",                    opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.27 },
+    { name:"Telecommunications",                   opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.22 },
+    { name:"IT Management & Governance",           opex:"[OPEX]", capex:"[CAPEX]", total:"[TOTAL]", pctRev:0, bmPct:0.04 }
+  ],
+
+  // ── FORWARD OUTLOOK ──────────────────────────────────
+  // milestones: [{label, year, value, sub, color}]  color: red|gold|green
+  milestones: [
+    { label: "[PERIOD] (Actual)",    year:"[YY]", value:"[SPEND]", sub:"[X]% of rev", note:"Current spend",  color:"red"   },
+    { label: "[PERIOD] (Projected)", year:"[YY]", value:"[SPEND]", sub:"[X]% of rev", note:"Tapering",       color:"gold"  },
+    { label: "[PERIOD] (Target)",    year:"[YY]", value:"[SPEND]", sub:"[X]% of rev", note:"Normalized",     color:"green" }
+  ],
+
+  // ── AUTOMATION DOMAINS ────────────────────────────────
+  // Each: { domain, current(%), target(%), gap(pp), priority, priorityColor }
+  automationDomains: [
+    { domain:"[Domain 1]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"red"   },
+    { domain:"[Domain 2]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"red"   },
+    { domain:"[Domain 3]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"gold"  },
+    { domain:"[Domain 4]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"gold"  },
+    { domain:"[Domain 5]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"blue"  },
+    { domain:"[Domain 6]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"gold"  },
+    { domain:"[Domain 7]", current:"[X]%", target:"[Y]%", gap:"[Z]pp", priority:"[Priority]", priorityColor:"slate" }
+  ],
+
+  // ── APPENDIX — NARRATIVE BLOCKS ──────────────────────
+  dataSources:        "[List primary data sources used: financial model, GL extracts, CAPEX project register, headcount data, etc.]",
+  benchmarkSources:   "[List benchmark providers and methodology: Gartner ITKMD, Hackett Group, West Monroe database, etc.]",
+  benchmarkMethod:    "[Describe peer set definition, data vintage, normalization approach, and blending methodology.]",
+  keyAssumptions:     "[List key assumptions: spend definition (OPEX+CAPEX), revenue basis, tower allocation method, forward projection assumptions, value opportunity methodology, etc.]",
+  towerMappingNotes:  "[Describe how vendor-level spend was mapped to towers and how the tie-out was validated.]",
+  limitations:        "[List key limitations and caveats: tower allocation uncertainty, benchmark peer set fit, value range assumptions, projection dependencies, data quality caveats, etc.]",
+
+  // ── EXECUTIVE NARRATIVES ─────────────────────────────
+  execSummaryNarrative:   "[Write a 3-4 paragraph executive summary: (1) current IT spend and IT % of revenue, (2) comparison to peer benchmark and size of gap, (3) what is temporary vs structural vs addressable, (4) the 2-3 year normalization / value-creation thesis, (5) stakeholder message.]",
+  gapNarrative:           "[Describe the gap decomposition: why the 3 components are sized as they are and what that means for the normalization timeline.]",
+  thesisNarrative:        "[Describe the forward normalization thesis: what needs to happen, by when, and what the expected spend trajectory looks like.]",
+  bottomLineNarrative:    "[Board-ready 1-2 sentence takeaway: what does leadership need to understand about this analysis?]",
+  yoyNarrative:           "[Explain the year-over-year story: what drove the change, what held, and what leadership should conclude.]",
+  benchmarkNarrative:     "[Summarize how the company compares to peers, what the gap is, and why it should be interpreted with context rather than as a blunt target.]",
+  automationNarrative:    "[Summarize automation maturity gap: where the largest gaps are and what value could be created.]",
+};
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════════════ -->
+<nav id="topbar">
+  <div class="wm-logo">
+    <div class="wm-logo-mark">WM</div>
+    <span class="wm-logo-text">West Monroe</span>
+  </div>
+  <div class="nav-divider"></div>
+  <div id="nav-tabs">
+    <button class="nav-tab active"  onclick="showSection('cover')">Overview</button>
+    <button class="nav-tab"         onclick="showSection('exec')">Executive Summary</button>
+    <button class="nav-tab"         onclick="showSection('yoy')">Year-over-Year</button>
+    <button class="nav-tab"         onclick="showSection('benchmark')">Benchmark</button>
+    <button class="nav-tab"         onclick="showSection('metrics')">Spend Metrics</button>
+    <button class="nav-tab"         onclick="showSection('towers')">Tower Analysis</button>
+    <button class="nav-tab"         onclick="showSection('recs')">Recommendations</button>
+    <button class="nav-tab"         onclick="showSection('appendix')">Appendix</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══════════════════ COVER ══════════════════════════ -->
+<section id="cover" class="section active">
+  <div id="cover-section">
+    <div class="cover-grid-bg"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow fade-up fade-up-d1">West Monroe Partners · Confidential</div>
+      <div class="cover-title fade-up fade-up-d2" id="cover-title"></div>
+      <div class="cover-subtitle fade-up fade-up-d3" id="cover-subtitle"></div>
+      <div class="cover-stats fade-up fade-up-d4" id="cover-stats"></div>
+      <div class="cover-tags fade-up fade-up-d5" id="cover-tags"></div>
+    </div>
+    <div class="cover-bottom-bar">
+      <span id="cover-footer-left"></span>
+      <span>Use navigation above to explore each section →</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ EXECUTIVE SUMMARY ══════════════ -->
+<section id="exec" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 01 · Executive Summary</div>
+    <div class="chapter-title" id="exec-chapter-title"></div>
+    <div class="chapter-desc" id="exec-chapter-desc"></div>
+  </div>
+  <div class="page-inner">
+    <div class="kpi-grid" id="exec-kpis"></div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Executive Summary</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+
+    <div class="card accent-left">
+      <div class="card-overline">Situation Assessment</div>
+      <div class="card-title" id="exec-narr-title">IT Spend Assessment</div>
+      <div class="card-body" id="exec-narr-body"></div>
+    </div>
+
+    <div class="two-col">
+      <div class="card accent-left blue">
+        <div class="card-overline">Gap Interpretation</div>
+        <div class="card-title">Three Types of Gap</div>
+        <div class="card-body" id="exec-gap-body"></div>
+      </div>
+      <div class="card">
+        <div class="card-overline">2–3 Year Thesis</div>
+        <div class="card-title">Normalization Trajectory</div>
+        <div class="card-body" id="exec-thesis-body"></div>
+      </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Key Metrics at a Glance</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="data-table-wrap"><table class="data-table" id="exec-metrics-table"></table></div>
+
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Value Opportunity Summary</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="data-table-wrap"><table class="data-table" id="exec-value-table"></table></div>
+
+    <div class="bottom-line-callout">
+      <div class="card-overline">The Bottom Line</div>
+      <div class="card-title">Leadership Takeaway</div>
+      <div class="card-body" id="exec-bottom-line"></div>
+    </div>
+  </div>
+  <div class="report-footer"><span id="footer-1"></span><span>Section 1 of 7</span></div>
+</section>
+
+<!-- ══════════════════ YEAR-OVER-YEAR ══════════════════ -->
+<section id="yoy" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 02 · Year-over-Year Analysis</div>
+    <div class="chapter-title" id="yoy-chapter-title"></div>
+    <div class="chapter-desc">Understanding the spend change — CAPEX vs OPEX dynamics and the normalization trajectory.</div>
+  </div>
+  <div class="page-inner">
+    <div class="card accent-left">
+      <div class="card-overline">Executive Insight</div>
+      <div class="card-title">Year-over-Year Narrative</div>
+      <div class="card-body" id="yoy-narrative"></div>
+    </div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">IT Spend: Prior Year vs. Current Year</div>
+        <div class="chart-subtitle">OPEX · CAPEX · TOTAL ($M)</div>
+        <canvas id="yoyChart"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">IT Spend as % of Revenue</div>
+        <div class="chart-subtitle">Actual vs. Peer Median (%)</div>
+        <canvas id="pctChart"></canvas>
+      </div>
+    </div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Key YoY Metrics</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="data-table-wrap"><table class="data-table" id="yoy-table"></table></div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Forward Outlook</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="card">
+      <div class="card-overline">Normalization Trajectory</div>
+      <div class="card-title">From Investment Peak to Operational Efficiency</div>
+      <div class="outlook-milestones" id="yoy-milestones"></div>
+    </div>
+    <div class="two-col">
+      <div class="card accent-left blue">
+        <div class="card-overline">Why Leadership Should Care</div>
+        <div class="card-title">Key Imperatives</div>
+        <div class="placeholder-card" style="margin:0">
+          <div class="placeholder-icon">✏️</div>
+          <div class="placeholder-text"><strong>Populate: Leadership Imperatives</strong>Summarize 3–5 reasons leadership should act on this analysis. Update <code>CONFIG.yoyNarrative</code> and add bullet logic here.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-overline">Spend Trajectory</div>
+        <div class="chart-wrap" style="margin-bottom:0;border:none;padding:0;box-shadow:none">
+          <canvas id="outlookChart" style="max-height:220px"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="report-footer"><span id="footer-2"></span><span>Section 2 of 7</span></div>
+</section>
+
+<!-- ══════════════════ BENCHMARK ═══════════════════════ -->
+<section id="benchmark" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 03 · Peer Group Benchmark Analysis</div>
+    <div class="chapter-title" id="bm-chapter-title"></div>
+    <div class="chapter-desc">Peer benchmark context, gap decomposition, and positioning in the distribution.</div>
+  </div>
+  <div class="page-inner">
+    <div class="card accent-left">
+      <div class="card-overline">Executive Insight</div>
+      <div class="card-title">Benchmark Narrative</div>
+      <div class="card-body" id="bm-narrative"></div>
+    </div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Benchmark Comparison</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="data-table-wrap"><table class="data-table" id="bm-table"></table></div>
+    <div class="chart-wrap">
+      <div class="chart-title">IT Spend Distribution — Peer Group Positioning</div>
+      <div class="chart-subtitle">% of Revenue · Company vs. peer benchmarks</div>
+      <canvas id="benchmarkChart" style="max-height:300px"></canvas>
+    </div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Gap Decomposition</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="card" id="gap-decomp-card">
+      <div class="card-overline">Gap Decomposition</div>
+      <div class="card-title" id="gap-decomp-title">Breaking Down the Gap to Peer Median</div>
+      <div class="gap-bar-track" id="gap-bar"></div>
+      <div class="gap-legend" id="gap-legend"></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-overline">Benchmark Methodology</div>
+        <div class="card-title">How the Peer Benchmark Was Constructed</div>
+        <div class="card-body" id="bm-method-body"></div>
+      </div>
+      <div class="card accent-left">
+        <div class="card-overline">Context Matters</div>
+        <div class="card-title">The Benchmark Is a Compass, Not a Verdict</div>
+        <div class="card-body">A company at median either (a) has already completed modernization and is running lean, (b) has not yet started its transformation and is underinvesting, or (c) is genuinely efficient. Trajectory and mix (OPEX vs. CAPEX) matter far more than the point-in-time percentage. A CAPEX-heavy profile is the hallmark of a company investing — not overspending.</div>
+      </div>
+    </div>
+  </div>
+  <div class="report-footer"><span id="footer-3"></span><span>Section 3 of 7</span></div>
+</section>
+
+<!-- ══════════════════ SPEND METRICS ═══════════════════ -->
+<section id="metrics" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 04 · Key Spend Metrics</div>
+    <div class="chapter-title">OPEX/CAPEX Mix · Spend per Head · Sourcing · Automation</div>
+    <div class="chapter-desc">Four diagnostic lenses that reveal the operational character of IT investment.</div>
+  </div>
+  <div class="page-inner">
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">1 · OPEX vs CAPEX Distribution</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">OPEX vs. CAPEX Mix</div>
+        <div class="chart-subtitle">Prior Year vs. Current Year</div>
+        <canvas id="opexCapexChart" style="max-height:260px"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-overline">Metric 1 — Insight</div>
+        <div class="card-title">CAPEX / OPEX Mix Analysis</div>
+        <div class="placeholder-card" style="margin:0">
+          <div class="placeholder-icon">✏️</div>
+          <div class="placeholder-text"><strong>Populate: OPEX/CAPEX Narrative</strong>Explain what the mix shift means strategically. Update CONFIG with actual data to auto-render this section.</div>
+        </div>
+      </div>
+    </div>
+    <div class="data-table-wrap"><table class="data-table" id="opex-table"></table></div>
+
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">2 · IT Spend per Head</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="two-col">
+      <div class="card accent-left">
+        <div class="card-overline">Metric 2 — IT Spend per Head</div>
+        <div class="card-title">IT Spend per Employee</div>
+        <div class="placeholder-card" style="margin:0">
+          <div class="placeholder-icon">✏️</div>
+          <div class="placeholder-text"><strong>Populate: Spend per Head Narrative</strong>Add headcount to CONFIG and populate the per-head analysis. Benchmark is typically $12K–$14K per employee at median.</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="margin-bottom:0">
+        <div class="chart-title">Spend per Head: Company vs. Peers</div>
+        <div class="chart-subtitle">Estimated based on total headcount ($000s)</div>
+        <canvas id="perHeadChart" style="max-height:220px"></canvas>
+      </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">3 · Sourcing Mix</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Sourcing Mix Estimate</div>
+        <div class="chart-subtitle">Internal FTE · Managed Services · Contractors · SaaS · Other (%)</div>
+        <canvas id="sourcingChart" style="max-height:240px"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-overline">Metric 3 — Sourcing Analysis</div>
+        <div class="card-title">Sourcing Mix Narrative</div>
+        <div class="placeholder-card" style="margin:0">
+          <div class="placeholder-icon">✏️</div>
+          <div class="placeholder-text"><strong>Populate: Sourcing Narrative</strong>Describe contractor vs. FTE vs. managed services balance. Update CONFIG with sourcing mix percentages to auto-render the chart.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">4 · Automation Potential vs. Achieved</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="card accent-left blue">
+      <div class="card-overline">Metric 4 — Automation Maturity</div>
+      <div class="card-title">Automation Gap Analysis</div>
+      <div class="card-body" id="automation-narrative"></div>
+    </div>
+    <div class="data-table-wrap"><table class="data-table" id="automation-table"></table></div>
+  </div>
+  <div class="report-footer"><span id="footer-4"></span><span>Section 4 of 7</span></div>
+</section>
+
+<!-- ══════════════════ TOWER ANALYSIS ══════════════════ -->
+<section id="towers" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 05 · IT Tower Analysis</div>
+    <div class="chapter-title">Spend by the Standard 8-Tower Framework</div>
+    <div class="chapter-desc">Tower-level allocation, benchmark comparison, and mix analysis.</div>
+  </div>
+  <div class="page-inner">
+    <div class="card accent-left">
+      <div class="card-overline">Tower Analysis Overview</div>
+      <div class="card-title">Tower Spend Summary</div>
+      <div class="placeholder-card" style="margin:0">
+        <div class="placeholder-icon">✏️</div>
+        <div class="placeholder-text"><strong>Populate: Tower Narrative</strong>Describe which towers dominate spend, which are above/below benchmark, and what the key implications are. Add tower dollar values to CONFIG to auto-render all charts and tables.</div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Tower Spend Distribution</div>
+        <div class="chart-subtitle" id="tower-doughnut-subtitle"></div>
+        <canvas id="towerDoughnut" style="max-height:300px"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Tower % of Revenue vs. Peer Median</div>
+        <div class="chart-subtitle">Company actual vs. benchmark</div>
+        <canvas id="towerBench" style="max-height:300px"></canvas>
+      </div>
+    </div>
+    <div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-dot"></div><div class="section-divider-label">Tower Summary</div><div class="section-divider-dot"></div><div class="section-divider-line"></div></div>
+    <div class="data-table-wrap"><table class="data-table" id="tower-table"></table></div>
+    <div class="card mt-6" id="tower-bars-card">
+      <div class="card-overline">Tower Benchmark Gap · Visual</div>
+      <div class="card-title" id="tower-bars-title">Tower Spend vs. Peer Median (% of Revenue)</div>
+      <div class="tower-grid" id="tower-bars"></div>
+    </div>
+  </div>
+  <div class="report-footer"><span id="footer-5"></span><span>Section 5 of 7</span></div>
+</section>
+
+<!-- ══════════════════ RECOMMENDATIONS ════════════════ -->
+<section id="recs" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 06 · Strategic Recommendations</div>
+    <div class="chapter-title">Top 5 Priorities — Ranked by Value & Urgency</div>
+    <div class="chapter-desc" id="recs-desc"></div>
+  </div>
+  <div class="page-inner">
+    <div class="data-table-wrap"><table class="data-table" id="recs-summary-table"></table></div>
+    <div id="recs-cards"></div>
+  </div>
+  <div class="report-footer"><span id="footer-6"></span><span>Section 6 of 7</span></div>
+</section>
+
+<!-- ══════════════════ APPENDIX ════════════════════════ -->
+<section id="appendix" class="section">
+  <div class="chapter-header">
+    <div class="chapter-eyebrow">Section 07 · Appendix</div>
+    <div class="chapter-title">Methodology, Data Sources & Key Assumptions</div>
+    <div class="chapter-desc">Audit trail, definitions, limitations, and data validation.</div>
+  </div>
+  <div class="page-inner" id="appendix-inner"></div>
+  <div class="report-footer"><span id="footer-7"></span><span>Section 7 of 7 · © West Monroe Partners</span></div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     RENDER ENGINE — reads CONFIG and builds the report
+═══════════════════════════════════════════════════════ -->
+<script>
+// ── helpers ──────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const badge = (text, color) => `<span class="badge ${color}">${text}</span>`;
+const ph = text => `<span style="color:var(--text-tertiary);font-style:italic">${text}</span>`;
+
+function isPlaceholder(val) {
+  if (val == null || val === 0 || val === '') return true;
+  if (typeof val === 'string' && val.startsWith('[')) return true;
+  return false;
+}
+
+// ── NAVIGATION ───────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  $(id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  ['cover','exec','yoy','benchmark','metrics','towers','recs','appendix'].forEach((s,i) => {
+    if (s === id) tabs[i].classList.add('active');
+  });
+  window.scrollTo(0,0);
+  setTimeout(initChartsForSection, 60);
+}
+
+// ── ACCORDIONS ───────────────────────────────────────
+function toggleRec(header) {
+  const chevron = header.querySelector('.rec-chevron');
+  const body = header.nextElementSibling;
+  const open = body.classList.contains('open');
+  header.classList.toggle('open', !open);
+  body.classList.toggle('open', !open);
+  chevron.classList.toggle('open', !open);
+}
+function toggleAppendix(header) {
+  const body = header.nextElementSibling;
+  const span = header.querySelector('span:last-child');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  span.textContent = open ? '▾' : '▴';
+}
+
+// ══════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ══════════════════════════════════════════════════
+
+function renderCover() {
+  $('cover-title').innerHTML = `${CONFIG.company} <span>IT Spend</span><br>Analysis Report`;
+  $('cover-subtitle').textContent = `Strategic assessment of ${CONFIG.period} IT investment, peer benchmarking, gap decomposition, and the ${CONFIG.valueTotal} value creation roadmap.`;
+  $('cover-stats').innerHTML = [
+    ['Total IT Spend', CONFIG.itSpend],
+    ['IT % of Revenue', CONFIG.itPctRev],
+    ['Gap to Peer Median', CONFIG.gapDollar],
+    ['Value Opportunity', CONFIG.valueTotal]
+  ].map(([label, val]) => `
+    <div class="cover-stat">
+      <div class="cover-stat-val">${val}</div>
+      <div class="cover-stat-label">${label}</div>
+    </div>`).join('');
+  $('cover-tags').innerHTML = CONFIG.tags.map(t => `<span class="cover-tag">${t}</span>`).join('');
+  $('cover-footer-left').innerHTML = `<strong>${CONFIG.company}</strong> — Prepared ${CONFIG.preparedDate} · ${CONFIG.period} Executive Briefing`;
+}
+
+function renderExec() {
+  $('exec-chapter-title').textContent = `${CONFIG.company} IT Spend Analysis & Strategic Recommendations`;
+  $('exec-chapter-desc').textContent = `${CONFIG.period} Executive Briefing | Prepared ${CONFIG.preparedDate}`;
+
+  // KPI grid
+  const kpis = [
+    { color:'blue',  eyebrow:`${CONFIG.period} Revenue`, val: CONFIG.revenue,     label:'Total Revenue',     delta:'', dClass:'neutral' },
+    { color:'',      eyebrow:'Total IT Spend',           val: CONFIG.itSpend,     label:'OPEX + CAPEX',      delta:'YoY change pending', dClass:'warn' },
+    { color:'red',   eyebrow:'IT % of Revenue',          val: CONFIG.itPctRev,    label:'Spend Intensity',   delta:'vs prior year', dClass:'warn' },
+    { color:'gold',  eyebrow:'Peer Median',              val: CONFIG.bmMedianPct, label:'Benchmark',         delta:`Company at ${CONFIG.gapPP}`, dClass:'neutral' },
+    { color:'',      eyebrow:'Gap to Peer Median',       val: CONFIG.gapDollar,   label:'Dollar Gap',        delta:'Above median', dClass:'warn' },
+    { color:'green', eyebrow:'Value Opportunity',        val: CONFIG.valueTotal,  label:'Annual Run-Rate',   delta:'3-Year Horizon', dClass:'pos' }
+  ];
+  $('exec-kpis').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.color}">
+      <div class="kpi-eyebrow">${k.eyebrow}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-label">${k.label}</div>
+      ${k.delta ? `<span class="kpi-delta ${k.dClass}">${k.delta}</span>` : ''}
+    </div>`).join('');
+
+  $('exec-narr-body').innerHTML = CONFIG.execSummaryNarrative.startsWith('[') ? ph(CONFIG.execSummaryNarrative) : CONFIG.execSummaryNarrative;
+  $('exec-gap-body').innerHTML  = CONFIG.gapNarrative.startsWith('[')  ? ph(CONFIG.gapNarrative)  : CONFIG.gapNarrative;
+  $('exec-thesis-body').innerHTML = CONFIG.thesisNarrative.startsWith('[') ? ph(CONFIG.thesisNarrative) : CONFIG.thesisNarrative;
+
+  // Metrics table
+  $('exec-metrics-table').innerHTML = `
+    <thead><tr><th>Metric</th><th>${CONFIG.periodPrior}</th><th>${CONFIG.period}</th><th>Change</th><th>Benchmark</th><th>Gap</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td>Revenue</td><td>${CONFIG.revenuePrior}</td><td>${CONFIG.revenue}</td><td>—</td><td>—</td><td>—</td><td>${badge('Verify','slate')}</td></tr>
+      <tr><td>Total IT Spend</td><td>${CONFIG.itSpendPrior}</td><td>${CONFIG.itSpend}</td><td>—</td><td>${CONFIG.bmMedianDollar}</td><td>${CONFIG.gapDollar}</td><td>${badge('Strategic elevation','blue')}</td></tr>
+      <tr><td>IT % of Revenue</td><td>${CONFIG.itPctRevPrior}</td><td>${CONFIG.itPctRev}</td><td>—</td><td>${CONFIG.bmMedianPct}</td><td>${CONFIG.gapPP}</td><td>${badge('Review','gold')}</td></tr>
+      <tr><td>IT OPEX</td><td>${CONFIG.itOpexPrior}</td><td>${CONFIG.itOpex}</td><td>—</td><td>—</td><td>—</td><td>${badge('Monitor','slate')}</td></tr>
+      <tr><td>IT CAPEX</td><td>${CONFIG.itCapexPrior}</td><td>${CONFIG.itCapex}</td><td>—</td><td>—</td><td>—</td><td>${badge('Strategic investment','blue')}</td></tr>
+    </tbody>`;
+
+  // Value table
+  $('exec-value-table').innerHTML = `
+    <thead><tr><th>#</th><th>Priority</th><th>Annual Value</th><th>Timeline</th><th>Complexity</th><th>Status</th></tr></thead>
+    <tbody>${CONFIG.recommendations.map((r,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.title}</td>
+        <td class="text-accent font-bold">${r.annualValue}</td>
+        <td>${r.timeline}</td>
+        <td>${badge(r.complexity, r.complexityColor)}</td>
+        <td>${badge(r.status, r.statusColor)}</td>
+      </tr>`).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="2">TOTAL OPPORTUNITY</td><td class="text-accent">${CONFIG.valueTotal}</td><td colspan="3">—</td></tr></tfoot>`;
+
+  $('exec-bottom-line').innerHTML = CONFIG.bottomLineNarrative.startsWith('[') ? ph(CONFIG.bottomLineNarrative) : CONFIG.bottomLineNarrative;
+  $('footer-1').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderYoY() {
+  $('yoy-chapter-title').textContent = `${CONFIG.periodPrior} → ${CONFIG.period}: What Changed and Why It Matters`;
+  $('yoy-narrative').innerHTML = CONFIG.yoyNarrative.startsWith('[') ? ph(CONFIG.yoyNarrative) : CONFIG.yoyNarrative;
+
+  $('yoy-table').innerHTML = `
+    <thead><tr><th>Metric</th><th>${CONFIG.periodPrior}</th><th>${CONFIG.period}</th><th>Change ($)</th><th>Change (%)</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td>Revenue</td><td>${CONFIG.revenuePrior}</td><td>${CONFIG.revenue}</td><td>—</td><td>—</td><td>${badge('Verify','slate')}</td></tr>
+      <tr><td>IT OPEX</td><td>${CONFIG.itOpexPrior}</td><td>${CONFIG.itOpex}</td><td>—</td><td>—</td><td>${badge('Monitor','slate')}</td></tr>
+      <tr><td>IT CAPEX</td><td>${CONFIG.itCapexPrior}</td><td>${CONFIG.itCapex}</td><td>—</td><td>—</td><td>${badge('Review','gold')}</td></tr>
+      <tr><td>Total IT Spend</td><td>${CONFIG.itSpendPrior}</td><td>${CONFIG.itSpend}</td><td>—</td><td>—</td><td>${badge('Investment peak','blue')}</td></tr>
+      <tr><td>IT % of Revenue</td><td>${CONFIG.itPctRevPrior}</td><td>${CONFIG.itPctRev}</td><td>—</td><td>—</td><td>${badge('Above median','magenta')}</td></tr>
+    </tbody>`;
+
+  const colorMap = { red: 'var(--red-500)', gold: 'var(--gold-500)', green: 'var(--green-500)' };
+  $('yoy-milestones').innerHTML = CONFIG.milestones.map(m => `
+    <div class="milestone">
+      <div class="milestone-dot" style="border-color:${colorMap[m.color]}">${m.year}</div>
+      <div class="milestone-year">${m.label}</div>
+      <div class="milestone-val">${m.value}</div>
+      <div class="milestone-sub">${m.sub}</div>
+      <div class="milestone-sub" style="color:${colorMap[m.color]};font-weight:700">${m.note}</div>
+    </div>`).join('');
+
+  $('footer-2').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderBenchmark() {
+  $('bm-chapter-title').textContent = `How ${CONFIG.company} Compares to Industry Peers — and What It Means`;
+  $('bm-narrative').innerHTML = CONFIG.benchmarkNarrative.startsWith('[') ? ph(CONFIG.benchmarkNarrative) : CONFIG.benchmarkNarrative;
+
+  $('bm-table').innerHTML = `
+    <thead><tr><th>Benchmark</th><th>% of Revenue</th><th>Dollar Equivalent</th><th>Gap (pp)</th><th>Gap ($)</th><th>Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td>Top Quartile (Most Efficient)</td><td>${CONFIG.bmTopQuartilePct}</td><td>—</td><td>—</td><td>—</td><td>${badge('Long-term target','green')}</td></tr>
+      <tr><td>Peer Median</td><td>${CONFIG.bmMedianPct}</td><td>${CONFIG.bmMedianDollar}</td><td>${CONFIG.gapPP}</td><td>${CONFIG.gapDollar}</td><td>${badge('3-year target','gold')}</td></tr>
+      <tr><td>75th Percentile</td><td>${CONFIG.bm75thPct}</td><td>—</td><td>—</td><td>—</td><td>${badge('Interim target','blue')}</td></tr>
+      <tr><td>${CONFIG.company} Actual (${CONFIG.period})</td><td>${CONFIG.itPctRev}</td><td>${CONFIG.itSpend}</td><td>—</td><td>—</td><td>${badge('Current position','magenta')}</td></tr>
+    </tbody>`;
+
+  // Gap decomp bar
+  const gTemp = CONFIG.gapTemporaryPct;
+  const gAddr = CONFIG.gapAddressablePct;
+  const gStrc = CONFIG.gapStructuralPct;
+  $('gap-decomp-title').textContent = `Breaking Down the ${CONFIG.gapDollar} Gap to Peer Median`;
+  $('gap-bar').innerHTML = `
+    <div class="gap-seg" style="flex:${gTemp||70};background:var(--blue-500)"><span>${gTemp||'~70'}% Temporary · ${CONFIG.gapTemporaryDollar}</span></div>
+    <div class="gap-seg" style="flex:${gAddr||23};background:var(--gold-500)"><span>${gAddr||'~23'}% Addressable · ${CONFIG.gapAddressableDollar}</span></div>
+    <div class="gap-seg" style="flex:${gStrc||8};background:var(--slate-400)"><span style="font-size:0.625rem">${gStrc||'~8'}%</span></div>`;
+  $('gap-legend').innerHTML = `
+    <div class="gap-legend-item"><div class="gap-legend-dot" style="background:var(--blue-500)"></div><span class="text-sm"><strong>Temporary (${CONFIG.gapTemporaryDollar}):</strong> ${CONFIG.gapTemporaryDollar} — investment-cycle CAPEX and implementation partners that will self-correct as projects complete.</span></div>
+    <div class="gap-legend-item"><div class="gap-legend-dot" style="background:var(--gold-500)"></div><span class="text-sm"><strong>Addressable (${CONFIG.gapAddressableDollar}):</strong> Application complexity and vendor fragmentation — requires active management.</span></div>
+    <div class="gap-legend-item"><div class="gap-legend-dot" style="background:var(--slate-400)"></div><span class="text-sm"><strong>Structural (${CONFIG.gapStructuralDollar}):</strong> Legitimate business complexity premium — justified cost of operating model.</span></div>`;
+
+  $('bm-method-body').innerHTML = CONFIG.benchmarkMethod.startsWith('[') ? ph(CONFIG.benchmarkMethod) : CONFIG.benchmarkMethod;
+  $('footer-3').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderMetrics() {
+  $('automation-narrative').innerHTML = CONFIG.automationNarrative.startsWith('[') ? ph(CONFIG.automationNarrative) : CONFIG.automationNarrative;
+  $('automation-table').innerHTML = `
+    <thead><tr><th>Domain</th><th>Current Automation</th><th>Target</th><th>Gap</th><th>Priority Investment</th></tr></thead>
+    <tbody>${CONFIG.automationDomains.map(d => `
+      <tr><td>${d.domain}</td><td>${d.current}</td><td>${d.target}</td><td>${badge(d.gap, d.priorityColor)}</td><td>${badge(d.priority, d.priorityColor)}</td></tr>`).join('')}
+    </tbody>`;
+  $('opex-table').innerHTML = `
+    <thead><tr><th>Metric</th><th>${CONFIG.periodPrior}</th><th>${CONFIG.period}</th><th>YoY Δ</th><th>Implication</th></tr></thead>
+    <tbody>
+      <tr><td>IT OPEX</td><td>${CONFIG.itOpexPrior}</td><td>${CONFIG.itOpex}</td><td>—</td><td>Operational cost trajectory</td></tr>
+      <tr><td>IT CAPEX</td><td>${CONFIG.itCapexPrior}</td><td>${CONFIG.itCapex}</td><td>—</td><td>Transformation investment</td></tr>
+      <tr><td>Total IT Spend</td><td>${CONFIG.itSpendPrior}</td><td>${CONFIG.itSpend}</td><td>—</td><td>Combined trajectory</td></tr>
+      <tr><td>CAPEX % of Total</td><td>—</td><td>—</td><td>—</td><td>Mix shift indicator</td></tr>
+    </tbody>`;
+  $('footer-4').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderTowers() {
+  const maxPct = Math.max(...CONFIG.towers.map(t => Math.max(t.pctRev, t.bmPct)), 0.01);
+  $('tower-doughnut-subtitle').textContent = `Estimated ${CONFIG.period} allocation`;
+  $('tower-table').innerHTML = `
+    <thead><tr><th>Tower</th><th>Est. OPEX</th><th>Est. CAPEX</th><th>Est. Total</th><th>% of Rev</th><th>BM Median</th><th>vs BM</th></tr></thead>
+    <tbody>${CONFIG.towers.map(t => {
+      const diff = (t.pctRev - t.bmPct).toFixed(2);
+      const color = diff > 0.1 ? 'red' : diff < -0.05 ? 'green' : 'gold';
+      return `<tr>
+        <td>${t.name}</td><td>${t.opex}</td><td>${t.capex}</td><td>${t.total}</td>
+        <td>${t.pctRev > 0 ? t.pctRev.toFixed(2)+'%' : '—'}</td>
+        <td>${t.bmPct.toFixed(2)}%</td>
+        <td>${t.pctRev > 0 ? badge((diff > 0 ? '+' : '')+diff+'pp', color) : badge('Pending','slate')}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+    <tfoot><tr><td>TOTAL</td><td>${CONFIG.itOpex}</td><td>${CONFIG.itCapex}</td><td>${CONFIG.itSpend}</td><td>${CONFIG.itPctRev}</td><td>${CONFIG.bmMedianPct}</td><td>${badge(CONFIG.gapPP,'magenta')}</td></tr></tfoot>`;
+
+  $('tower-bars-title').textContent = `${CONFIG.company} Tower Spend vs. Peer Median (% of Revenue)`;
+  $('tower-bars').innerHTML = CONFIG.towers.map(t => {
+    const pct = t.pctRev;
+    const bm  = t.bmPct;
+    const fillPct = maxPct > 0 ? Math.round((pct / maxPct) * 100) : 0;
+    const over = pct > bm + 0.1;
+    const ok   = pct <= bm + 0.05;
+    const cls  = over ? 'over' : ok ? 'ok' : '';
+    const valColor = over ? 'var(--magenta-500)' : ok ? 'var(--green-500)' : 'var(--text-secondary)';
+    return `
+      <div class="tower-row">
+        <div class="tower-label">${t.name}</div>
+        <div class="tower-bar-track">
+          <div class="tower-bar-fill ${cls}" style="width:${fillPct}%"></div>
+        </div>
+        <div class="tower-pct" style="color:${valColor}">${pct > 0 ? pct.toFixed(2)+'%' : '—'} <small style="color:var(--slate-300)">(BM ${bm.toFixed(2)}%)</small></div>
+      </div>`;
+  }).join('');
+
+  $('footer-5').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderRecs() {
+  $('recs-desc').textContent = `${CONFIG.valueTotal} annual value opportunity across a 3-year horizon. Click each priority to expand the full analysis.`;
+  $('recs-summary-table').innerHTML = `
+    <thead><tr><th>#</th><th>Priority</th><th>Annual Value</th><th>Timeline</th><th>Complexity</th><th>Status</th></tr></thead>
+    <tbody>${CONFIG.recommendations.map((r,i) => `
+      <tr><td>${i+1}</td><td>${r.title}</td><td class="text-accent font-bold">${r.annualValue}</td><td>${r.timeline}</td>
+      <td>${badge(r.complexity, r.complexityColor)}</td><td>${badge(r.status, r.statusColor)}</td></tr>`).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="2">TOTAL OPPORTUNITY</td><td class="text-accent">${CONFIG.valueTotal}</td><td colspan="3">—</td></tr></tfoot>`;
+
+  $('recs-cards').innerHTML = CONFIG.recommendations.map((r, i) => `
+    <div class="rec-card">
+      <div class="rec-header" onclick="toggleRec(this)">
+        <div class="rec-num">${i+1}</div>
+        <div class="rec-meta">
+          <div class="rec-priority">Priority #${i+1}</div>
+          <div class="rec-name">${r.title}</div>
+          <div class="rec-desc">${r.tagline}</div>
+        </div>
+        <div class="rec-badges">
+          ${badge(r.annualValue, r.complexityColor === 'green' ? 'green' : 'blue')}
+          ${badge(r.timeline, 'slate')}
+          ${badge(r.complexity, r.complexityColor)}
+        </div>
+        <div class="rec-chevron">▾</div>
+      </div>
+      <div class="rec-body">
+        <div class="rec-section-title">The Issue</div>
+        <div class="rec-text">${r.issue.startsWith('[') ? `<em style="color:var(--text-tertiary)">${r.issue}</em>` : r.issue}</div>
+        <div class="rec-section-title">The Opportunity</div>
+        <div class="rec-text">${r.opportunity.startsWith('[') ? `<em style="color:var(--text-tertiary)">${r.opportunity}</em>` : r.opportunity}</div>
+        <div class="rec-section-title">Recommended Actions</div>
+        <ul class="action-list">${r.actions.map(a => `<li>${a.startsWith('[') ? `<em style="color:var(--text-tertiary)">${a}</em>` : a}</li>`).join('')}</ul>
+      </div>
+    </div>`).join('');
+
+  $('footer-6').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+function renderAppendix() {
+  const blocks = [
+    { title: '1. Data Sources', body: `<p><strong>Primary data sources:</strong></p><div style="margin:8px 0 12px 16px;color:var(--text-secondary)">${CONFIG.dataSources.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.dataSources}</em>` : CONFIG.dataSources}</div><p><strong>Benchmark sources:</strong></p><div style="margin:8px 0 0 16px;color:var(--text-secondary)">${CONFIG.benchmarkSources.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.benchmarkSources}</em>` : CONFIG.benchmarkSources}</div>` },
+    { title: '2. Key Financial Data (Verified Tie-Out)', body: `
+      <div class="data-table-wrap" style="margin-bottom:0">
+        <table class="data-table">
+          <thead><tr><th>Line Item</th><th>${CONFIG.periodPrior}</th><th>${CONFIG.period}</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Revenue</td><td>${CONFIG.revenuePrior}</td><td>${CONFIG.revenue}</td><td>[Financial model]</td></tr>
+            <tr><td>IT OPEX</td><td>${CONFIG.itOpexPrior}</td><td>${CONFIG.itOpex}</td><td>[GL extract]</td></tr>
+            <tr><td>IT CAPEX</td><td>${CONFIG.itCapexPrior}</td><td>${CONFIG.itCapex}</td><td>[CAPEX register]</td></tr>
+            <tr><td>Total IT Spend</td><td>${CONFIG.itSpendPrior}</td><td>${CONFIG.itSpend}</td><td>OPEX + CAPEX</td></tr>
+            <tr><td>IT % of Revenue</td><td>${CONFIG.itPctRevPrior}</td><td>${CONFIG.itPctRev}</td><td>Calculated</td></tr>
+            <tr><td>Peer Median</td><td>${CONFIG.bmMedianPct}</td><td>${CONFIG.bmMedianPct}</td><td>[Benchmark source]</td></tr>
+          </tbody>
+        </table>
+      </div>` },
+    { title: '3. Benchmark Methodology',          body: CONFIG.benchmarkMethod.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.benchmarkMethod}</em>` : CONFIG.benchmarkMethod },
+    { title: '4. Key Assumptions',                body: CONFIG.keyAssumptions.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.keyAssumptions}</em>` : CONFIG.keyAssumptions },
+    { title: '5. IT Tower Mapping Methodology',   body: CONFIG.towerMappingNotes.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.towerMappingNotes}</em>` : CONFIG.towerMappingNotes },
+    { title: '6. Limitations & Caveats',          body: CONFIG.limitations.startsWith('[') ? `<em style="color:var(--text-tertiary)">${CONFIG.limitations}</em>` : CONFIG.limitations }
+  ];
+  $('appendix-inner').innerHTML = blocks.map(b => `
+    <div class="appendix-section">
+      <div class="appendix-header" onclick="toggleAppendix(this)"><span>${b.title}</span><span>▾</span></div>
+      <div class="appendix-body">${b.body}</div>
+    </div>`).join('') + `
+    <div class="card navy-bg mt-6" style="text-align:center;padding:40px">
+      <div class="card-overline" style="text-align:center">West Monroe Partners</div>
+      <div class="card-title" style="font-size:1.5rem;text-align:center;margin-bottom:8px">Questions or Follow-On Analysis?</div>
+      <div class="card-body" style="text-align:center">Contact your West Monroe engagement team to discuss findings, validate data sources, or commission additional workstreams.</div>
+    </div>`;
+  $('footer-7').textContent = `${CONFIG.company} — IT Spend Analysis | West Monroe Partners | Confidential`;
+}
+
+// ══════════════════════════════════════════════════
+//  CHARTS
+// ══════════════════════════════════════════════════
+Chart.defaults.font.family = 'Arial, Helvetica, sans-serif';
+Chart.defaults.color = '#50658E';
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding = 16;
+
+const WM = {
+  navy:'#070154', blue:'#0047FF', magenta:'#F900D3', cyan:'#00E8FA',
+  green:'#1DD566', gold:'#FFC700', orange:'#FF8A00', red:'#F52C00',
+  slate:'#50658E', slate2:'#97A4BA'
+};
+
+let chartsInitialized = {};
+
+function initChartsForSection() {
+  const id = document.querySelector('.section.active')?.id;
+  if (!id || chartsInitialized[id]) return;
+  chartsInitialized[id] = true;
+  if (id === 'yoy')       initYoYCharts();
+  if (id === 'benchmark') initBenchmarkCharts();
+  if (id === 'metrics')   initMetricsCharts();
+  if (id === 'towers')    initTowerCharts();
+}
+
+function safeChart(id, config) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  new Chart(canvas, config);
+}
+
+function initYoYCharts() {
+  const p = CONFIG.periodPrior, c = CONFIG.period;
+  const hasData = CONFIG.itOpexRaw > 0;
+
+  safeChart('yoyChart', {
+    type: 'bar',
+    data: {
+      labels: ['IT OPEX', 'IT CAPEX', 'Total IT Spend'],
+      datasets: [
+        { label: p, data: hasData ? [CONFIG.itOpexPriorRaw, CONFIG.itCapexPriorRaw, CONFIG.itSpendPriorRaw] : [0,0,0], backgroundColor: WM.slate, borderRadius: 4 },
+        { label: c, data: hasData ? [CONFIG.itOpexRaw, CONFIG.itCapexRaw, CONFIG.itSpendRaw] : [0,0,0], backgroundColor: WM.blue, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins: { legend:{ position:'top' }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y}M` } } },
+      scales: {
+        y: { grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `$${v}M` }, beginAtZero:true },
+        x: { grid:{ display:false } }
+      }
+    }
+  });
+
+  safeChart('pctChart', {
+    type: 'bar',
+    data: {
+      labels: [p, c, 'Peer Median', 'Target'],
+      datasets: [{
+        label: 'IT % of Revenue',
+        data: [CONFIG.itPctRevPriorRaw, CONFIG.itPctRevRaw, CONFIG.bmMedianPctRaw, 0],
+        backgroundColor: [WM.slate, WM.magenta, WM.green, WM.blue],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y.toFixed(2)}%` } } },
+      scales: {
+        y: { grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `${v}%` }, beginAtZero:true },
+        x: { grid:{ display:false } }
+      }
+    }
+  });
+
+  safeChart('outlookChart', {
+    type: 'line',
+    data: {
+      labels: CONFIG.milestones.map(m => m.label),
+      datasets: [
+        { label:'IT Spend', data: CONFIG.milestones.map(() => 0), borderColor: WM.blue, backgroundColor:'rgba(0,71,255,0.08)', fill:true, tension:0.35, pointRadius:5 },
+        { label:'Peer Median', data: CONFIG.milestones.map(() => CONFIG.bmMedianPctRaw), borderColor: WM.green, borderDash:[6,3], fill:false, tension:0.2, pointRadius:3 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ position:'top' } },
+      scales: {
+        y: { grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `$${v}M` } },
+        x: { grid:{ display:false } }
+      }
+    }
+  });
+}
+
+function initBenchmarkCharts() {
+  safeChart('benchmarkChart', {
+    type: 'bar',
+    data: {
+      labels: ['Top Quartile', 'Peer Median', '75th Percentile', `${CONFIG.company} Actual`],
+      datasets: [{
+        label: 'IT Spend as % of Revenue',
+        data: [CONFIG.bmTopQuartileRaw, CONFIG.bmMedianPctRaw, CONFIG.bm75thRaw, CONFIG.itPctRevRaw],
+        backgroundColor: [WM.green, WM.green, WM.gold, WM.magenta],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis:'y', responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x.toFixed(2)}% of Revenue` } } },
+      scales: {
+        x: { grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `${v}%` } },
+        y: { grid:{ display:false } }
+      }
+    }
+  });
+}
+
+function initMetricsCharts() {
+  safeChart('opexCapexChart', {
+    type: 'bar',
+    data: {
+      labels: [CONFIG.periodPrior, CONFIG.period],
+      datasets: [
+        { label:'IT OPEX', data:[CONFIG.itOpexPriorRaw, CONFIG.itOpexRaw], backgroundColor:WM.slate, borderRadius:[0,0,4,4] },
+        { label:'IT CAPEX', data:[CONFIG.itCapexPriorRaw, CONFIG.itCapexRaw], backgroundColor:WM.blue, borderRadius:[4,4,0,0] }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ position:'top' } },
+      scales: {
+        x:{ stacked:true, grid:{ display:false } },
+        y:{ stacked:true, grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `$${v}M` } }
+      }
+    }
+  });
+
+  safeChart('perHeadChart', {
+    type: 'bar',
+    data: {
+      labels: ['Top Quartile', 'Peer Median', 'Target', `${CONFIG.company} ${CONFIG.period}`],
+      datasets: [{
+        label:'IT Spend per Head ($K)',
+        data:[9.5, 13.0, 14.5, 0],
+        backgroundColor:[WM.green, WM.green, WM.blue, WM.magenta],
+        borderRadius:4
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ display:false } },
+      scales: {
+        y:{ grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `$${v}K` } },
+        x:{ grid:{ display:false } }
+      }
+    }
+  });
+
+  safeChart('sourcingChart', {
+    type: 'doughnut',
+    data: {
+      labels:['Internal FTE','Managed Services','Implementation Partners','SaaS/Cloud','Other'],
+      datasets: [{
+        data:[0,0,0,0,0],
+        backgroundColor:[WM.navy, WM.blue, WM.magenta, WM.cyan, WM.slate2],
+        borderWidth:2, borderColor:'#fff'
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true, cutout:'55%',
+      plugins:{
+        legend:{ position:'right', labels:{ padding:12 } },
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } }
+      }
+    }
+  });
+}
+
+function initTowerCharts() {
+  const towers = CONFIG.towers.map(t => t.name.length > 25 ? t.name.substring(0,22)+'…' : t.name);
+  const vals   = CONFIG.towers.map(t => t.pctRev || 0);
+  const bms    = CONFIG.towers.map(t => t.bmPct);
+
+  safeChart('towerDoughnut', {
+    type: 'doughnut',
+    data: {
+      labels: towers,
+      datasets: [{
+        data: vals.some(v => v > 0) ? vals : CONFIG.towers.map(() => 1),
+        backgroundColor:[WM.navy, WM.magenta, WM.blue, WM.gold, WM.cyan, WM.green, WM.slate, WM.orange],
+        borderWidth:2, borderColor:'#fff'
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true, cutout:'50%',
+      plugins:{ legend:{ position:'right', labels:{ padding:10, font:{ size:11 } } } }
+    }
+  });
+
+  safeChart('towerBench', {
+    type: 'bar',
+    data: {
+      labels: towers,
+      datasets: [
+        { label:`${CONFIG.company} Actual (% Rev)`, data: vals, backgroundColor: WM.blue, borderRadius:3 },
+        { label:'Peer Median (% Rev)',   data: bms,  backgroundColor: WM.green, borderRadius:3 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ position:'top' } },
+      scales: {
+        x:{ grid:{ display:false }, ticks:{ font:{ size:10 } } },
+        y:{ grid:{ color:'#E8EEF8' }, ticks:{ callback: v => `${v}%` } }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.title = `${CONFIG.company} — IT Spend Analysis | West Monroe`;
+  renderCover();
+  renderExec();
+  renderYoY();
+  renderBenchmark();
+  renderMetrics();
+  renderTowers();
+  renderRecs();
+  renderAppendix();
+});
+</script>
+</body>
+</html>

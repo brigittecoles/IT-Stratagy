@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Strategy Diagnostic — Powered by Gartner 2026 Benchmarks</title>
+  <title>IT Strategy Diagnostic — West Monroe</title>
   <style>
     :root {
       --navy: #002855;
@@ -40,7 +40,7 @@
       display: inline-block;
       background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.2);
-      color: var(--cyan);
+      color: var(--magenta);
       font-size: 0.75rem;
       font-weight: 600;
       padding: 0.3rem 1rem;
@@ -48,6 +48,7 @@
       margin-bottom: 1.25rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      border-color: rgba(227,28,121,0.4);
     }
     .hero h1 {
       font-size: 2.25rem;
@@ -339,6 +340,30 @@
       color: var(--slate-500);
     }
 
+    /* ─── Sample Output Link ─── */
+    .sample-link-section {
+      text-align: center;
+      padding: 2rem 0 0;
+    }
+    .sample-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--blue);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sample-link:hover {
+      background: var(--blue);
+      color: var(--white);
+    }
+    .sample-link svg { width: 18px; height: 18px; }
+
     /* ─── Responsive ─── */
     @media (max-width: 640px) {
       .hero h1 { font-size: 1.75rem; }
@@ -346,13 +371,33 @@
       .levels-table { font-size: 0.8125rem; }
       .levels-table th, .levels-table td { padding: 0.625rem 0.75rem; }
     }
+
+    /* ─── Print / PDF ─── */
+    @media print {
+      body { background: #fff; }
+      .hero { padding: 2rem 1.5rem 1.5rem; break-after: avoid; }
+      .section { padding: 1.5rem 0; break-inside: avoid; }
+      .section + .section { border-top: 1px solid #ddd; }
+      .value-grid { gap: 0.75rem; }
+      .value-card { box-shadow: none; border: 1px solid #ddd; }
+      .levels-table th { background: #002855 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .levels-table tr:nth-child(even) td { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .prereq-box { border: 2px solid #0076CE; }
+      .cta-section { background: #002855 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 2rem; }
+      .begin-btn { background: #00BFD6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .copy-btn { display: none; }
+      .fallback-copy { display: none; }
+      .toast { display: none; }
+      .footer { font-size: 0.6875rem; }
+      a[href^="codex://"]::after { content: " (codex://new deep link)"; font-size: 0.6875rem; color: #64748B; }
+    }
   </style>
 </head>
 <body>
 
   <!-- ─── Hero ─── -->
   <header class="hero">
-    <div class="hero-badge">Gartner 2026 IT Key Metrics</div>
+    <div class="hero-badge">West Monroe</div>
     <h1>IT Strategy Diagnostic</h1>
     <p>
       Benchmark your client's IT spending, staffing, and investment posture against
@@ -462,6 +507,29 @@
       </table>
     </div>
 
+    <!-- ─── Sample Output ─── -->
+    <div class="section">
+      <div class="section-label">Sample Output</div>
+      <h2>What does the deliverable look like?</h2>
+      <p>
+        The diagnostic produces a comprehensive, interactive report with an executive summary,
+        year-over-year analysis, peer benchmarking, gap decomposition, IT tower breakdown,
+        strategic recommendations, and a full methodology appendix.
+      </p>
+      <div class="sample-link-section">
+        <a class="sample-link" href="sample-report.html" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          View Sample Report
+        </a>
+      </div>
+    </div>
+
     <!-- ─── Prerequisites ─── -->
     <div class="section">
       <div class="section-label">Pre-Requisite</div>
@@ -549,7 +617,7 @@
   </div>
 
   <div class="footer">
-    IT Strategy Diagnostic &middot; Powered by Gartner 2026 IT Key Metrics Data &middot; 15 Industries &middot; P10&ndash;P90 Distributions
+    West Monroe &middot; IT Strategy Diagnostic &middot; 15 Industries &middot; Full Percentile Benchmarking
   </div>
 
   <div id="toast" class="toast">Prompt copied to clipboard!</div>
