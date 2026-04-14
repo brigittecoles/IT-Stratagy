@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/bcoles/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/740b5f59-4cf6-4b39-bb8d-ce0e20c1cdc1/a8fbba51-d402-4132-8f11-0a2e0b365817/skills/xlsx/**)",
+      "Bash(python3 -c ':*)"
+    ]
+  }
+}
