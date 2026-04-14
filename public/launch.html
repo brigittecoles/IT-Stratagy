@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Strategy Diagnostic — Launch</title>
+  <style>
+    :root {
+      --navy: #002855;
+      --blue: #0076CE;
+      --cyan: #00BFD6;
+      --magenta: #E31C79;
+      --light: #F4F6F8;
+      --white: #FFFFFF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--light);
+      color: var(--navy);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,40,85,0.10);
+      max-width: 600px;
+      width: 100%;
+      padding: 3rem 2.5rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--navy);
+    }
+    .subtitle {
+      color: #5A6B7D;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .launch-btn {
+      display: inline-block;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 1.125rem;
+      font-weight: 600;
+      padding: 1rem 2.5rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 1rem;
+    }
+    .launch-btn:hover { background: var(--navy); transform: translateY(-1px); }
+    .launch-btn:active { transform: translateY(0); }
+    .launch-btn.secondary {
+      background: var(--white);
+      color: var(--blue);
+      border: 2px solid var(--blue);
+      font-size: 1rem;
+      padding: 0.75rem 2rem;
+    }
+    .launch-btn.secondary:hover { background: #EEF5FC; }
+    .divider {
+      margin: 1.5rem 0;
+      color: #94A3B8;
+      font-size: 0.875rem;
+    }
+    .help-text {
+      color: #94A3B8;
+      font-size: 0.8125rem;
+      margin-top: 1.5rem;
+      line-height: 1.6;
+    }
+    .help-text a { color: var(--blue); text-decoration: none; }
+    .help-text a:hover { text-decoration: underline; }
+    .badge {
+      display: inline-block;
+      background: #EEF5FC;
+      color: var(--blue);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+    .copied-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--navy);
+      color: var(--white);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    .copied-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Gartner 2026 Benchmarks</div>
+    <h1>IT Strategy Diagnostic</h1>
+    <p class="subtitle">
+      Benchmark your company's IT spending, staffing, and investment posture
+      against industry peers across 15 industries.
+    </p>
+
+    <a id="codex-link" class="launch-btn" href="#">
+      Launch in Codex
+    </a>
+
+    <div class="divider">or</div>
+
+    <button class="launch-btn secondary" onclick="copyPrompt()">
+      Copy Prompt to Clipboard
+    </button>
+
+    <p class="help-text">
+      <strong>Codex not installed?</strong> Download it at
+      <a href="https://openai.com/index/introducing-codex/" target="_blank">openai.com/codex</a>
+      <br><br>
+      <strong>Using Claude Code instead?</strong> Copy the prompt and paste it there — it works the same way.
+    </p>
+  </div>
+
+  <div id="toast" class="copied-toast">Prompt copied to clipboard!</div>
+
+  <script>
+    const PROMPT = `Clone https://github.com/brigittecoles/IT-Stratagy.git, then install dependencies:
+
+cd IT-Stratagy && npm install && cd mcp-server && npm install && cd ..
+
+Then connect the MCP server by running: codex mcp add it-strategy-diagnostic -- npx tsx mcp-server/src/index.ts
+
+Now run a full IT strategy diagnostic. Use the MCP tools to:
+1. Call create_analysis to start a new analysis
+2. Ask me for my company name, industry, revenue, and IT spend
+3. Call submit_intake with the data I provide
+4. Call run_analysis to execute the benchmark pipeline
+5. Call export_summary to show me the executive summary
+6. Offer to generate the full 10-sheet report via generate_report
+
+Walk me through it conversationally — ask for one piece of data at a time.`;
+
+    // Build the codex:// deep link
+    const codexUrl = `codex://new?prompt=${encodeURIComponent(PROMPT)}`;
+    document.getElementById('codex-link').href = codexUrl;
+
+    function copyPrompt() {
+      navigator.clipboard.writeText(PROMPT).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = PROMPT;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    }
+  </script>
+</body>
+</html>
