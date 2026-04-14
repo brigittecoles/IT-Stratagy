@@ -12,9 +12,10 @@ import { selectBenchmarkFamily } from '@/lib/engine/n02-benchmark-select';
 import { determineQualification } from '@/lib/resolver/qualification';
 import type { CompanyProfile, FiscalYear, CanonicalAnalysis } from '@/lib/schema/validation';
 import type { EngineResult } from '@/lib/engine/types';
+import { resultsStore } from '@/lib/results-store';
 
-// ── Results cache (server-side) ──
-const resultsCache = new Map<string, EngineResult>();
+// ── Results cache (shared singleton — also used by API routes) ──
+const resultsCache = resultsStore;
 
 // ── Create a new analysis and redirect to form ──
 export async function createNewAnalysis(
