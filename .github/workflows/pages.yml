@@ -1,0 +1,54 @@
+name: Deploy standalone HTML to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/standalone/**'
+      - 'public/it-strategy-standalone.html'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate single-file bundle from modular sources
+        run: bash public/standalone/build.sh
+
+      - name: Assemble Pages site
+        run: |
+          mkdir -p _site
+          # Landing page: the self-contained standalone.
+          cp public/it-strategy-standalone.html _site/index.html
+          # Also publish the modular sources so anyone can link directly.
+          cp -R public/standalone _site/standalone
+          # And the raw single-file copy, for curl -o downloads.
+          cp public/it-strategy-standalone.html _site/it-strategy-standalone.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

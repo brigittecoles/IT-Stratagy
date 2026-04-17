@@ -1,0 +1,2506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT Strategy Diagnostic</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   West Monroe Design System — from src/app/globals.css
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --wm-navy: #070154;
+  --wm-navy-50: #E8E8F5;
+  --wm-blue: #0047FF;
+  --wm-blue-50: #E6EEFF;
+  --wm-blue-100: #CCDDFF;
+  --wm-blue-600: #0037B8;
+  --wm-magenta: #F900D3;
+  --wm-magenta-100: #FECCF6;
+  --wm-magenta-600: #C700AA;
+  --wm-slate-50: #F4F7FC;
+  --wm-slate-100: #E8EEF8;
+  --wm-slate-200: #CED7E6;
+  --wm-slate-300: #97A4BA;
+  --wm-slate-400: #8A9BBB;
+  --wm-slate-600: #50658E;
+  --wm-red: #F52C00;
+  --background: #FFFFFF;
+  --foreground: #070154;
+  --muted-foreground: #50658E;
+  --border: #CED7E6;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  color: var(--foreground);
+  background: var(--background);
+  display: flex; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+aside.sidebar {
+  width: 280px; flex-shrink: 0;
+  background: var(--wm-navy); color: #fff;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,.12);
+}
+/* Narrow-viewport collapse — the Claude Code preview panel is typically <600px wide.
+   Sidebar becomes a compact top bar so content has room to breathe. */
+@media (max-width: 900px) {
+  body { flex-direction: column; }
+  aside.sidebar {
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .sidebar .title-bar {
+    height: 56px; border-bottom: none;
+    padding: 0 12px; flex: 0 0 auto; gap: 8px;
+  }
+  .sidebar .title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+  .sidebar nav {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 8px;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .sidebar nav a {
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 6px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .sidebar .footer { display: none; }
+}
+@media (max-width: 520px) {
+  .sidebar .title { display: none; }
+}
+@media (max-width: 900px) {
+  .container { padding: 20px 16px; }
+}
+.sidebar .title-bar {
+  height: 64px; display: flex; align-items: center; gap: 12px;
+  padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sidebar .logo {
+  width: 32px; height: 32px; background: var(--wm-blue);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 13px;
+}
+.sidebar .title { font-size: 13px; font-weight: 700; color: #fff; }
+.sidebar nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+.sidebar nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; border-radius: 6px;
+  color: rgba(255,255,255,.70); text-decoration: none;
+  font-size: 13px; font-weight: 500;
+  transition: background .15s, color .15s; cursor: pointer;
+}
+.sidebar nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
+.sidebar nav a.active { background: rgba(255,255,255,.08); color: #fff; }
+.sidebar nav a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar .footer {
+  border-top: 1px solid rgba(255,255,255,.12);
+  padding: 16px 24px; color: rgba(255,255,255,.40); font-size: 11px;
+}
+
+/* Main */
+main.main { flex: 1; overflow-y: auto; }
+.container { max-width: 1152px; margin: 0 auto; padding: 32px; }
+.content-wrap { max-width: 896px; }
+.wizard-container { max-width: 720px; }
+.form-container { max-width: 768px; }
+
+.stack-8 > * + * { margin-top: 32px; }
+.stack-6 > * + * { margin-top: 24px; }
+.stack-4 > * + * { margin-top: 16px; }
+.stack-3 > * + * { margin-top: 12px; }
+.stack-2 > * + * { margin-top: 8px; }
+
+/* Back link */
+.back-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 14px; color: var(--muted-foreground);
+  text-decoration: none; cursor: pointer;
+  background: none; border: none; padding: 0;
+  font-family: inherit; transition: color .15s;
+}
+.back-link:hover { color: var(--foreground); }
+.back-link svg { width: 16px; height: 16px; }
+
+/* Titles */
+.wm-overline {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--wm-magenta); display: inline-block;
+}
+h1.page-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 4px 0 0; }
+p.page-sub { margin: 4px 0 0; color: var(--muted-foreground); font-size: 14px; }
+
+/* Section heads */
+.section-head { display: flex; align-items: center; gap: 8px; }
+.section-head svg { color: var(--wm-magenta); width: 20px; height: 20px; }
+.section-head h2 { font-size: 18px; font-weight: 700; margin: 0; }
+.section-sub { font-size: 14px; color: var(--muted-foreground); margin: 0; }
+
+/* Level grid (New Analysis) */
+.level-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .level-grid { grid-template-columns: 1fr 1fr; } }
+.level-btn {
+  text-align: left; background: #fff;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; cursor: pointer;
+  transition: all .15s;
+  font-family: inherit; font-size: inherit; color: inherit;
+}
+.level-btn:hover { border-color: var(--wm-slate-300); box-shadow: 0 4px 12px rgba(7,1,84,0.10); }
+.level-btn.selected { border-color: var(--wm-blue); background: var(--wm-blue-50); box-shadow: 0 0 0 1px var(--wm-blue); }
+.level-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.level-name { font-weight: 700; font-size: 14px; }
+.level-desc { font-size: 12px; color: var(--muted-foreground); margin: 0; }
+
+/* Badges */
+.wm-badge {
+  border-radius: 9999px; padding: 2px 10px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em;
+  line-height: 1.4; white-space: nowrap;
+}
+.wm-badge-primary { background: var(--wm-blue-100); color: var(--wm-blue-600); }
+.wm-badge-accent  { background: var(--wm-magenta-100); color: var(--wm-magenta-600); }
+.wm-badge-neutral { background: var(--wm-slate-100); color: var(--wm-slate-600); }
+
+/* Mode grid (intake methods) */
+.mode-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 640px) { .mode-grid { grid-template-columns: repeat(3, 1fr); } }
+.mode-btn { text-align: left; padding: 0; background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit; }
+.mode-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 8px; height: 100%;
+  transition: all .15s; overflow: hidden;
+}
+.mode-btn:hover .mode-card { box-shadow: 0 4px 12px rgba(7,1,84,0.10); }
+.mode-header { padding: 16px 16px 12px; }
+.mode-header-row { display: flex; align-items: center; justify-content: space-between; }
+.mode-icon-tile {
+  background: var(--wm-navy-50); border-radius: 6px; padding: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mode-icon-tile svg { width: 20px; height: 20px; color: var(--wm-navy); }
+.mode-title { font-size: 16px; font-weight: 600; margin: 12px 0 0; letter-spacing: -0.01em; }
+.mode-desc { font-size: 14px; color: var(--muted-foreground); margin: 4px 0 0; }
+.mode-body { padding: 0 16px 16px; }
+.mode-detail { font-size: 12px; color: var(--muted-foreground); line-height: 1.6; margin: 0; }
+
+/* Views */
+.view { display: none; }
+.view.active { display: block; }
+.hide { display: none !important; }
+
+/* ══════════ Inputs (shared) ══════════ */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; padding: 10px 12px;
+  font: inherit; color: var(--foreground);
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 8px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--wm-blue);
+  box-shadow: 0 0 0 3px rgba(0,71,255,.12);
+}
+label.field-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+label.field-label .req { color: var(--wm-red); margin-left: 2px; }
+.field-hint { font-size: 12px; color: var(--muted-foreground); margin: 4px 0 0; }
+.currency-wrap { position: relative; }
+.currency-sym {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--muted-foreground); font-size: 13px;
+}
+.currency-wrap input { padding-left: 22px; }
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .field-grid-2, .field-grid-3 { grid-template-columns: 1fr; } }
+
+/* ══════════ Buttons ══════════ */
+.btn {
+  padding: 10px 18px; font: inherit; font-weight: 500;
+  border-radius: 8px; cursor: pointer; border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all .15s;
+}
+.btn-outline { background: #fff; border-color: var(--border); color: var(--foreground); }
+.btn-outline:hover:not(:disabled) { background: var(--wm-slate-50); }
+.btn-primary { background: var(--wm-blue); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--wm-blue-600); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn svg { width: 14px; height: 14px; }
+
+/* ══════════ Wizard ══════════ */
+.progress-wrap { margin: 32px 0 24px; }
+.progress-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted-foreground); margin-bottom: 8px; }
+.progress-bar { height: 6px; background: var(--wm-slate-100); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--wm-blue), #3370FF); transition: width .3s; }
+.q-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(7,1,84,0.08); }
+.q-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 24px; }
+.q-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 999px; background: rgba(0,71,255,.10); color: var(--wm-blue);
+  display: flex; align-items: center; justify-content: center;
+}
+.q-icon svg { width: 16px; height: 16px; }
+.q-prompt { font-size: 16px; font-weight: 500; margin: 0 0 4px; }
+.q-help { font-size: 13px; color: var(--muted-foreground); margin: 0; }
+.q-required { font-size: 11px; color: var(--wm-red); font-weight: 500; margin: 4px 0 0; }
+.q-input { margin-left: 48px; }
+.bool-row { display: flex; gap: 12px; }
+.bool-btn {
+  flex: 1; padding: 10px 16px; font: inherit; font-weight: 500;
+  border: 1px solid var(--border); background: #fff;
+  color: var(--foreground); border-radius: 8px; cursor: pointer;
+  transition: all .15s;
+}
+.bool-btn:hover { border-color: var(--wm-slate-300); }
+.bool-btn.selected { background: var(--wm-blue); color: #fff; border-color: var(--wm-blue); }
+.multi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+@media (max-width: 560px) { .multi-grid { grid-template-columns: repeat(2,1fr); } }
+.multi-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: 6px; cursor: pointer; font-size: 13px; user-select: none;
+}
+.multi-opt:hover { background: var(--wm-slate-50); }
+.multi-opt.checked { border-color: var(--wm-blue); background: var(--wm-blue-50); }
+.multi-opt input { accent-color: var(--wm-blue); margin: 0; }
+.nav-row { display: flex; justify-content: space-between; margin-top: 24px; }
+
+.summary-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-top: 20px;
+}
+pre.payload {
+  background: var(--wm-navy); color: #e8f1ff;
+  border-radius: 8px; padding: 14px;
+  font: 12px/1.55 "SF Mono", Menlo, Consolas, monospace;
+  overflow-x: auto; margin-top: 12px;
+}
+.copy-btn {
+  margin-top: 8px; background: var(--wm-blue); color: #fff;
+  border: none; padding: 6px 12px; font-size: 12px; font-weight: 500;
+  border-radius: 6px; cursor: pointer;
+}
+
+/* ══════════ Form step indicator ══════════ */
+.step-nav { display: flex; align-items: center; gap: 4px; margin-bottom: 32px; }
+.step-nav-item { flex: 1; display: flex; align-items: center; }
+.step-nav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  flex: 0 0 auto;
+  color: var(--muted-foreground);
+  font-family: inherit;
+  transition: color .15s;
+}
+.step-nav-btn.active { color: var(--wm-blue); }
+.step-nav-btn.complete { color: var(--wm-blue); opacity: .85; }
+.step-circle {
+  width: 32px; height: 32px; border-radius: 999px;
+  border: 2px solid var(--border); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  transition: all .15s;
+}
+.step-nav-btn.active .step-circle { border-color: var(--wm-blue); background: var(--wm-blue); color: #fff; }
+.step-nav-btn.complete .step-circle { border-color: var(--wm-blue); background: rgba(0,71,255,.10); color: var(--wm-blue); }
+.step-label { font-size: 12px; }
+.step-label .opt { color: var(--muted-foreground); margin-left: 2px; }
+.step-line { flex: 1; height: 1px; background: var(--border); margin: 0 4px; margin-bottom: 22px; }
+.step-line.complete { background: var(--wm-blue); }
+@media (max-width: 640px) { .step-label { display: none; } }
+
+/* Form panel card */
+.panel {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  box-shadow: 0 1px 3px rgba(7,1,84,0.08);
+}
+.panel h3 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+.panel-sub { font-size: 13px; color: var(--muted-foreground); margin: 0 0 16px; }
+.panel-section h4 {
+  margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--foreground);
+}
+.panel-section h4 .opt { font-weight: 400; color: var(--muted-foreground); margin-left: 6px; }
+
+/* Checkbox tile (transformation) */
+.chkgrid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+@media (max-width: 720px) { .chkgrid-5 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 480px) { .chkgrid-5 { grid-template-columns: repeat(2, 1fr); } }
+
+/* Dropzone (file-drop + form-step-6) */
+.dropzone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .dropzone-grid { grid-template-columns: 1fr; } }
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 24px; text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  min-height: 140px;
+  justify-content: center;
+  position: relative;
+}
+.dropzone:hover { border-color: rgba(0,71,255,.4); background: var(--wm-slate-50); }
+.dropzone.drag { border-color: var(--wm-blue); background: var(--wm-blue-50); }
+.dropzone.has-file { border-color: rgba(0,71,255,.4); background: var(--wm-blue-50); }
+.dropzone svg.dropzone-icon { width: 32px; height: 32px; color: var(--muted-foreground); }
+.dropzone.has-file svg.dropzone-icon { color: var(--wm-blue); }
+.dropzone-title { font-size: 13px; font-weight: 500; }
+.dropzone-hint { font-size: 11px; color: var(--muted-foreground); }
+.dropzone-remove {
+  position: absolute; top: 6px; right: 6px;
+  width: 22px; height: 22px; border-radius: 999px;
+  border: none; background: rgba(7,1,84,.06);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted-foreground);
+}
+.dropzone-remove:hover { background: rgba(7,1,84,.12); color: var(--foreground); }
+.dropzone-remove svg { width: 12px; height: 12px; }
+
+/* File-drop step indicator (numbered 1/2/3) */
+.fdstep-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; }
+.fdstep-item { display: flex; align-items: center; gap: 8px; flex: 1; }
+.fdstep-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font: inherit; font-size: 14px; font-weight: 500;
+  color: var(--muted-foreground); font-family: inherit;
+  transition: color .15s;
+}
+.fdstep-btn.active { color: var(--wm-blue); }
+.fdstep-btn.complete { color: var(--wm-navy); cursor: pointer; }
+.fdstep-circle {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 999px;
+  font-size: 11px; font-weight: 700;
+  background: var(--wm-slate-100); color: var(--muted-foreground);
+}
+.fdstep-btn.active .fdstep-circle { background: var(--wm-blue); color: #fff; }
+.fdstep-btn.complete .fdstep-circle { background: rgba(7,1,84,.10); color: var(--wm-navy); }
+.fdstep-line { flex: 1; height: 1px; background: var(--border); }
+.fdstep-line.complete { background: rgba(7,1,84,.2); }
+
+/* Parse results + extracted */
+.parse-results {
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--wm-slate-50); padding: 16px;
+}
+.parse-results h4 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+.parse-line { font-size: 13px; color: var(--muted-foreground); margin: 0; white-space: pre-wrap; }
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.data-pill {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px; border-radius: 6px;
+  background: rgba(232,238,248,.5);
+  font-size: 13px;
+}
+.data-pill .label { color: var(--muted-foreground); font-size: 12px; text-transform: capitalize; }
+.data-pill .value { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Diagnostic level banner */
+.level-banner {
+  border-radius: 8px; border: 1px solid var(--border);
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--wm-slate-50);
+  display: flex; align-items: center; gap: 12px;
+}
+.level-banner .bicon {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: rgba(0,71,255,.10); color: var(--wm-blue);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.level-banner .bicon svg { width: 16px; height: 16px; }
+.level-banner .btxt { flex: 1; }
+.level-banner .btxt .t { font-size: 13px; font-weight: 600; }
+.level-banner .btxt .s { font-size: 12px; color: var(--muted-foreground); }
+
+/* Dashboard empty state */
+.dash-empty {
+  text-align: center; padding: 48px 32px;
+  background: var(--wm-navy); border-radius: 12px; color: #fff;
+}
+.dash-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+@media (max-width: 640px) { .dash-stat-grid { grid-template-columns: 1fr; } }
+.dash-stat {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+}
+.dash-stat .wm-overline { color: var(--wm-magenta); }
+.dash-stat .val {
+  font-size: 36px; font-weight: 700; color: var(--wm-magenta);
+  letter-spacing: -0.02em; line-height: 1.15; margin-top: 4px;
+}
+
+/* Row helper */
+.row { display: flex; align-items: center; gap: 8px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* Default size for inline SVGs so they don't blow up when no context-specific rule exists */
+svg:not([width]):not([height]) { width: 16px; height: 16px; flex-shrink: 0; }
+/* But larger in contexts that set their own size */
+.sidebar .logo svg, .mode-icon-tile svg { width: 20px; height: 20px; }
+.dropzone svg.dropzone-icon { width: 32px !important; height: 32px !important; }
+.export-icon svg { width: 20px; height: 20px; }
+.q-icon svg { width: 16px; height: 16px; }
+
+/* ══════════ Review + Results shared ══════════ */
+.results-container { max-width: 1100px; }
+
+/* Review table */
+.review-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.review-table thead {
+  background: var(--wm-navy); color: #fff;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.review-table th { padding: 10px 14px; text-align: left; }
+.review-table td { padding: 10px 14px; border-top: 1px solid var(--border-2, #eef1f6); }
+.review-table tr:nth-child(even) td { background: var(--wm-slate-50); }
+.review-table .tmono { font-variant-numeric: tabular-nums; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+.review-table .tdim { color: var(--muted-foreground); font-size: 12px; }
+
+/* Status pills */
+.pill {
+  display: inline-block; padding: 2px 8px; border-radius: 9999px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.pill-ok   { background: #D2F6E0; color: #0A7B3E; }
+.pill-miss { background: #FDBFB8; color: #B82200; }
+
+/* Action bar */
+.action-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 24px; padding: 16px 20px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--wm-slate-50);
+  gap: 16px;
+}
+
+/* Results tabs */
+.tabs-nav {
+  display: flex; gap: 2px; margin-top: 24px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 16px; font: inherit; font-weight: 700; font-size: 13px;
+  border: none; background: none; border-bottom: 2px solid transparent;
+  color: var(--muted-foreground);
+  cursor: pointer; white-space: nowrap;
+  transition: color .15s, border-color .15s;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--foreground); border-bottom-color: var(--wm-slate-200); }
+.tab-btn.active { color: var(--wm-blue); border-bottom-color: var(--wm-blue); }
+.tab-btn svg { width: 14px; height: 14px; }
+
+/* KPI grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+.kpi-val {
+  font-size: 28px; font-weight: 700; color: var(--wm-magenta);
+  letter-spacing: -0.02em; line-height: 1.15; margin-top: 4px;
+}
+.kpi-delta { font-size: 11px; color: var(--muted-foreground); margin-top: 4px; }
+
+/* YoY grid */
+.yoy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 640px) { .yoy-grid { grid-template-columns: 1fr; } }
+.ydim { font-size: 11px; color: var(--muted-foreground); }
+.ybig { font-size: 22px; font-weight: 700; margin-top: 4px; letter-spacing: -0.02em; }
+.ymed { font-size: 18px; font-weight: 700; margin-top: 4px; }
+
+/* Benchmark chart (pure CSS horizontal bars) */
+.bench-chart { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.bench-row { display: grid; grid-template-columns: 180px 1fr 80px; gap: 12px; align-items: center; font-size: 12px; }
+.bench-label { color: var(--foreground); font-weight: 500; }
+.bench-track {
+  position: relative; height: 10px;
+  background: var(--wm-slate-100); border-radius: 4px;
+}
+.bench-zero {
+  position: absolute; top: -2px; bottom: -2px; left: 50%; width: 1px;
+  background: var(--wm-slate-300);
+}
+.bench-bar { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.bench-bar.pos { background: var(--wm-red); }
+.bench-bar.neg { background: #1DD566; }
+.bench-val { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; text-align: right; }
+.bench-val.pos { color: var(--wm-red); }
+.bench-val.neg { color: #0A7B3E; }
+@media (max-width: 640px) { .bench-row { grid-template-columns: 120px 1fr 60px; } }
+
+/* Findings */
+.findings { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.findings li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+.f-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 999px;
+  background: var(--wm-blue-50); color: var(--wm-blue);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+
+/* Key Message (navy bg) */
+.key-message {
+  background: var(--wm-navy); color: #fff;
+  padding: 24px; border-radius: 12px; margin-top: 16px;
+}
+
+/* Recommendation grid */
+.rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 720px) { .rec-grid { grid-template-columns: 1fr; } }
+.rec-card { border-left: 3px solid var(--wm-blue); }
+.rec-card.rec-high   { border-left-color: var(--wm-red); }
+.rec-card.rec-medium { border-left-color: #FFC700; }
+.rec-card.rec-low    { border-left-color: var(--wm-blue); }
+
+/* Alerts (QA checks) */
+.alert {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px; border-radius: 8px; border-left: 3px solid;
+  font-size: 13px;
+}
+.alert-ok   { background: #D2F6E0; border-left-color: #1DD566; }
+.alert-warn { background: #FFF4CC; border-left-color: #FFC700; }
+.alert-err  { background: #FDBFB8; border-left-color: var(--wm-red); }
+.alert-info { background: #CCFAFE; border-left-color: #00E8FA; }
+.alert-dot {
+  width: 8px; height: 8px; border-radius: 999px; background: currentColor; flex-shrink: 0;
+  opacity: .5;
+}
+
+/* Confidence badges */
+.wm-badge-ok   { background: #D2F6E0; color: #0A7B3E; }
+.wm-badge-warn { background: #FFF4CC; color: #8B6B00; }
+.wm-badge-err  { background: #FDBFB8; color: #B82200; }
+
+/* Caveat list */
+.caveat-list {
+  margin: 0; padding-left: 16px; color: var(--muted-foreground); font-size: 13px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+/* Export rows */
+.export-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px; border-radius: 8px; border: 1px solid var(--border);
+  transition: background .15s;
+}
+.export-row:hover { background: var(--wm-slate-50); }
+.export-row.featured {
+  background: rgba(230,238,255,.3);
+  border-color: var(--wm-blue);
+}
+.export-row.featured:hover { background: rgba(230,238,255,.5); }
+.export-icon {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: var(--wm-navy-50); color: var(--wm-navy);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.export-row.featured .export-icon { background: var(--wm-blue); color: #fff; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="title-bar">
+    <div class="logo">IT</div>
+    <span class="title">IT Strategy Diagnostic</span>
+  </div>
+  <nav>
+    <a data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Dashboard
+    </a>
+    <a data-view="new" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+      New Analysis
+    </a>
+  </nav>
+  <div class="footer">v0.1.0 &middot; West Monroe</div>
+</aside>
+
+<main class="main">
+  <div class="container">
+    <section id="view-new" class="view active content-wrap"></section>
+    <section id="view-dashboard" class="view content-wrap"></section>
+    <section id="view-wizard" class="view wizard-container"></section>
+    <section id="view-form" class="view form-container"></section>
+    <section id="view-filedrop" class="view form-container"></section>
+    <section id="view-review" class="view content-wrap"></section>
+    <section id="view-results" class="view results-container"></section>
+  </div>
+</main>
+
+<script>
+
+/* ======= data.js ======= */
+'use strict';
+
+// Mirrors src/lib/schema/value-lists.ts
+const GICS_GROUPS = ['Energy','Materials','Industrials','Consumer Discretionary','Consumer Staples','Health Care','Financials','Information Technology','Communication Services','Utilities','Real Estate'];
+const BUSINESS_MODELS = ['Manufacturing','Distribution','Services','Software / SaaS','Healthcare delivery','Healthcare payer','Financial services','Retail / omnichannel','Hybrid / multi-model','Other'];
+const COMPLEXITY_LEVELS = ['Low','Moderate','High'];
+const TRANSFORMATION_STATUS = ['Yes','No','Unsure'];
+const TRANSFORMATION_TYPES = ['ERP','WMS','Cloud','Data','Cybersecurity','AI','CRM','Network','Infrastructure','Other'];
+const FISCAL_YEAR_LABELS = ['Last Fiscal Year','Current Fiscal Year','Assumption for Next Fiscal Year','Assumption for Following Fiscal Year','Custom'];
+const FILE_ZONES = ['IT Financials','IT Vendors','IT FTEs and Contractors','Project Portfolio / Roadmap'];
+const DIAGNOSTIC_LEVELS = [
+  'Quick Read',
+  'Standard Diagnostic',
+  'Full Diagnostic',
+  'Full Diagnostic with Vendor + Roadmap Intelligence',
+];
+const LEVEL_DESCRIPTIONS = {
+  'Quick Read': 'High-level IT spend benchmarks. Requires minimal data.',
+  'Standard Diagnostic': 'Spend, staffing, and transformation benchmarks with peer comparisons.',
+  'Full Diagnostic': 'Comprehensive analysis including vendor concentration and roadmap assessment.',
+  'Full Diagnostic with Vendor + Roadmap Intelligence': 'Everything plus detailed vendor and project portfolio intelligence.',
+};
+
+// Intake mode cards — from src/app/analysis/new/page.tsx
+const INTAKE_MODES = [
+  {
+    key: 'form',
+    title: 'Simple Form',
+    description: 'Enter your numbers directly',
+    detail: 'Best when you have IT spend figures, headcounts, and revenue numbers ready. Fastest path to a diagnostic.',
+    badge: 'Fastest',
+    badgeClass: 'wm-badge-neutral',
+    iconPath: '<rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  },
+  {
+    key: 'wizard',
+    title: 'Guided Wizard',
+    description: 'Answer plain-language questions',
+    detail: 'We walk you through each data point with context and guidance. Great if you are unsure what numbers to provide.',
+    badge: 'Recommended',
+    badgeClass: 'wm-badge-accent',
+    iconPath: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/>',
+  },
+  {
+    key: 'file-drop',
+    title: 'File Drop',
+    description: 'Upload your data files',
+    detail: 'Upload IT budgets, vendor lists, org charts, or project portfolios. Our parser will extract the key data points.',
+    badge: 'Most data',
+    badgeClass: 'wm-badge-neutral',
+    iconPath: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  },
+];
+
+// Wizard questions — mirrors src/app/analysis/[id]/wizard/page.tsx
+const WIZARD_QUESTIONS = [
+  { id:'company_name', step:1, stepLabel:'Company Profile', prompt:'What is the name of the company?', type:'text', required:true },
+  { id:'industry', step:1, stepLabel:'Company Profile', prompt:'Which GICS industry sector best describes this company?', type:'select', options:GICS_GROUPS, required:true },
+  { id:'business_model', step:1, stepLabel:'Company Profile', prompt:'What is the primary business model?', helpText:'You can skip this if unsure.', type:'select', options:BUSINESS_MODELS },
+  { id:'regulatory_complexity', step:1, stepLabel:'Company Profile', prompt:'How would you rate regulatory complexity?', type:'select', options:COMPLEXITY_LEVELS },
+  { id:'operating_complexity', step:1, stepLabel:'Company Profile', prompt:'How would you rate operating complexity?', type:'select', options:COMPLEXITY_LEVELS },
+  { id:'pricing_complexity', step:1, stepLabel:'Company Profile', prompt:'How would you rate pricing / premium complexity?', type:'select', options:COMPLEXITY_LEVELS },
+  { id:'fiscal_year_label', step:2, stepLabel:'Financial Baseline', prompt:'Which fiscal year does this data represent?', type:'select', options:FISCAL_YEAR_LABELS, required:true },
+  { id:'revenue', step:2, stepLabel:'Financial Baseline', prompt:'What is the annual revenue?', helpText:'Enter in USD.', type:'currency', required:true },
+  { id:'total_it_spend', step:2, stepLabel:'Financial Baseline', prompt:'What is the total IT spend?', type:'currency', required:true },
+  { id:'it_opex', step:2, stepLabel:'Financial Baseline', prompt:'What is the IT operating expenditure (OpEx)?', helpText:"Skip if you don't have this breakdown.", type:'currency' },
+  { id:'it_capex', step:2, stepLabel:'Financial Baseline', prompt:'What is the IT capital expenditure (CapEx)?', type:'currency' },
+  { id:'it_da', step:2, stepLabel:'Financial Baseline', prompt:'What is the IT depreciation and amortization (D&A)?', type:'currency' },
+  { id:'has_prior_year', step:3, stepLabel:'Prior Year', prompt:'Do you have prior year financial data to provide?', helpText:'This enables trend analysis but is optional.', type:'boolean' },
+  { id:'employee_count', step:4, stepLabel:'Workforce', prompt:'What is the total employee count?', type:'number', required:true },
+  { id:'it_fte_count', step:4, stepLabel:'Workforce', prompt:'How many IT FTEs (full-time equivalents)?', type:'number', required:true },
+  { id:'contractor_count', step:4, stepLabel:'Workforce', prompt:'How many IT contractors?', helpText:'Skip if unknown.', type:'number' },
+  { id:'contractor_spend', step:4, stepLabel:'Workforce', prompt:'What is the total contractor spend?', type:'currency' },
+  { id:'transformation_status', step:5, stepLabel:'Transformation', prompt:'Is a major transformation program currently active?', type:'select', options:TRANSFORMATION_STATUS },
+  { id:'transformation_types', step:5, stepLabel:'Transformation', prompt:'What types of transformation are underway?', helpText:'Select all that apply.', type:'multiselect', options:TRANSFORMATION_TYPES },
+  { id:'transformation_spend', step:5, stepLabel:'Transformation', prompt:'What is the estimated transformation spend?', type:'currency' },
+  { id:'roadmap_available', step:5, stepLabel:'Transformation', prompt:'Is a technology roadmap available for upload?', type:'boolean' },
+  { id:'has_files', step:6, stepLabel:'File Upload', prompt:'Do you have supporting files (financials, vendor lists, org charts, roadmaps) to upload?', helpText:'You can upload files after completing the wizard.', type:'boolean' },
+];
+const WIZARD_TOTAL_STEPS = 6;
+
+// Form steps — mirrors src/app/analysis/[id]/form/page.tsx
+const FORM_STEPS = [
+  { label: 'Company Profile', key: 'company' },
+  { label: 'Financial Baseline', key: 'financial' },
+  { label: 'Prior Year', key: 'prior', optional: true },
+  { label: 'Workforce', key: 'workforce' },
+  { label: 'Transformation', key: 'transformation' },
+  { label: 'File Upload', key: 'files', optional: true },
+];
+
+// File Drop steps — mirrors src/app/analysis/[id]/file-drop/page.tsx
+const FILEDROP_STEPS = [
+  { key: 'upload', label: 'Upload Files' },
+  { key: 'company', label: 'Company Profile' },
+  { key: 'review', label: 'Review & Submit' },
+];
+
+// Utilities
+const $  = (s, root) => (root || document).querySelector(s);
+const $$ = (s, root) => (root || document).querySelectorAll(s);
+const fmtNum = (n) => (n == null || n === '') ? '' : Number(n).toLocaleString('en-US');
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function parseInt10(s) { const c = String(s).replace(/[^0-9]/g,''); return c ? parseInt(c, 10) : null; }
+function parseFloat10(s) { const c = String(s).replace(/[^0-9.]/g,''); return c ? parseFloat(c) : null; }
+
+// SVG path helpers (lucide-react shapes)
+const SVG = {
+  back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  chevL: '<polyline points="15 18 9 12 15 6"/>',
+  chevR: '<polyline points="9 18 15 12 9 6"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  fileSheet: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/>',
+  building: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>',
+  gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  loader: '<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
+};
+function icoSvg(path, cls) {
+  return `<svg ${cls?`class="${cls}"`:''} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
+
+/* ======= views-picker.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// View: /analysis/new (pixel clone of screenshot)
+// ══════════════════════════════════════════════════════════════
+function renderNewAnalysisView() {
+  const host = document.getElementById('view-new');
+  host.innerHTML = `
+    <div class="stack-8">
+      <button class="back-link" data-view="dashboard" type="button">
+        ${icoSvg(SVG.back)}
+        Back to Dashboard
+      </button>
+      <div>
+        <span class="wm-overline">New</span>
+        <h1 class="page-title">New Analysis</h1>
+        <p class="page-sub">Choose your diagnostic depth and preferred data intake method.</p>
+      </div>
+      <section class="stack-4">
+        <div class="section-head">
+          ${icoSvg(SVG.gauge)}
+          <h2>Set Expectations</h2>
+        </div>
+        <p class="section-sub">Select the diagnostic level that matches the depth of insight you need. Higher levels require more data.</p>
+        <div class="level-grid" id="level-grid"></div>
+      </section>
+      <section class="stack-4">
+        <h2 style="font-size:18px;font-weight:700;margin:0">Choose Intake Method</h2>
+        <p class="section-sub">Pick the way you would like to provide your data. You can combine methods later.</p>
+        <div class="mode-grid" id="mode-grid"></div>
+      </section>
+    </div>
+  `;
+  renderLevels();
+  renderModes();
+}
+
+function renderLevels() {
+  const host = $('#level-grid');
+  host.innerHTML = '';
+  for (const level of DIAGNOSTIC_LEVELS) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'level-btn' + (level === state.selectedLevel ? ' selected' : '');
+    btn.innerHTML = `
+      <div class="level-row">
+        <span class="level-name">${escapeHtml(level)}</span>
+        ${level === state.selectedLevel ? '<span class="wm-badge wm-badge-primary">Selected</span>' : ''}
+      </div>
+      <p class="level-desc">${escapeHtml(LEVEL_DESCRIPTIONS[level])}</p>
+    `;
+    btn.onclick = () => { state.selectedLevel = level; renderLevels(); };
+    host.appendChild(btn);
+  }
+}
+
+function renderModes() {
+  const host = $('#mode-grid');
+  host.innerHTML = '';
+  for (const mode of INTAKE_MODES) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mode-btn';
+    btn.innerHTML = `
+      <div class="mode-card">
+        <div class="mode-header">
+          <div class="mode-header-row">
+            <div class="mode-icon-tile">${icoSvg(mode.iconPath)}</div>
+            <span class="wm-badge ${mode.badgeClass}">${escapeHtml(mode.badge)}</span>
+          </div>
+          <h3 class="mode-title">${escapeHtml(mode.title)}</h3>
+          <p class="mode-desc">${escapeHtml(mode.description)}</p>
+        </div>
+        <div class="mode-body">
+          <p class="mode-detail">${escapeHtml(mode.detail)}</p>
+        </div>
+      </div>
+    `;
+    btn.onclick = () => showView(mode.key);
+    host.appendChild(btn);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// View: /dashboard — mirrors src/app/dashboard/page.tsx
+// ══════════════════════════════════════════════════════════════
+function renderDashboardView() {
+  const host = document.getElementById('view-dashboard');
+  host.innerHTML = `
+    <div class="stack-8">
+      <div class="row-between">
+        <div>
+          <span class="wm-overline">Overview</span>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub">Manage your IT strategy diagnostic analyses.</p>
+        </div>
+        <button class="btn btn-primary" data-view="new">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+          New Analysis
+        </button>
+      </div>
+      <div class="dash-stat-grid">
+        <div class="dash-stat"><span class="wm-overline">Total Analyses</span><div class="val">0</div></div>
+        <div class="dash-stat"><span class="wm-overline">In Progress</span><div class="val">0</div></div>
+        <div class="dash-stat"><span class="wm-overline">Completed</span><div class="val">0</div></div>
+      </div>
+      <div class="dash-empty">
+        <h3 style="margin:0 0 8px;font-size:20px">No analyses yet</h3>
+        <p style="color:rgba(255,255,255,.7);margin:0 0 20px;font-size:14px">Start a new IT strategy diagnostic to benchmark your IT spending, staffing, and investment posture against <strong style="color:var(--wm-magenta)">industry peers</strong>.</p>
+        <button class="btn btn-primary" data-view="new" style="background:var(--wm-magenta);border-color:var(--wm-magenta)">
+          New Analysis
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* ======= views-wizard.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// View: Wizard — mirrors src/app/analysis/[id]/wizard/page.tsx
+// ══════════════════════════════════════════════════════════════
+function renderWizardView() {
+  const host = document.getElementById('view-wizard');
+  host.innerHTML = `
+    <button class="back-link" data-view="new" type="button">
+      ${icoSvg(SVG.back)}
+      Back to New Analysis
+    </button>
+    <div style="margin-top:24px">
+      <h1 class="page-title">IT Strategy Diagnostic</h1>
+      <p class="page-sub">Guided walkthrough — one question at a time.</p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="step-label"></span>
+        <span id="step-count"></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="q-card" id="q-card">
+      <div class="q-head">
+        <div class="q-icon">${icoSvg(SVG.msg)}</div>
+        <div>
+          <p class="q-prompt" id="q-prompt">—</p>
+          <p class="q-help" id="q-help"></p>
+          <p class="q-required hide" id="q-required">Required</p>
+        </div>
+      </div>
+      <div class="q-input" id="q-input"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-outline" id="btn-back" disabled>
+        ${icoSvg(SVG.chevL)}
+        Back
+      </button>
+      <button class="btn btn-primary" id="btn-next">
+        Next ${icoSvg(SVG.chevR)}
+      </button>
+    </div>
+    <div id="completion-view" class="hide"></div>
+  `;
+  $('#btn-next').onclick = wizardNext;
+  $('#btn-back').onclick = wizardBack;
+  state.wizardIndex = 0;
+  state.answers = {};
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = WIZARD_QUESTIONS[state.wizardIndex];
+  const progress = ((state.wizardIndex + 1) / WIZARD_QUESTIONS.length) * 100;
+  $('#step-label').textContent = `Step ${q.step} of ${WIZARD_TOTAL_STEPS}: ${q.stepLabel}`;
+  $('#step-count').textContent = `${state.wizardIndex + 1} / ${WIZARD_QUESTIONS.length}`;
+  $('#progress-fill').style.width = progress + '%';
+  $('#q-prompt').textContent = q.prompt;
+  $('#q-help').textContent = q.helpText || '';
+  $('#q-help').style.display = q.helpText ? '' : 'none';
+  $('#q-required').classList.toggle('hide', !q.required);
+  renderWizardInput(q);
+  $('#btn-back').disabled = state.wizardIndex === 0;
+  const isLast = state.wizardIndex === WIZARD_QUESTIONS.length - 1;
+  $('#btn-next').innerHTML = isLast
+    ? `${icoSvg(SVG.check)} Submit`
+    : `${q.required ? 'Next' : 'Skip / Next'} ${icoSvg(SVG.chevR)}`;
+  wizardUpdateNext();
+}
+
+function renderWizardInput(q) {
+  const host = $('#q-input');
+  host.innerHTML = '';
+  const cur = state.answers[q.id];
+  if (q.type === 'text') {
+    const el = document.createElement('input');
+    el.type = 'text';
+    el.placeholder = 'Type your answer...';
+    el.value = cur ?? '';
+    el.oninput = () => { state.answers[q.id] = el.value; wizardUpdateNext(); };
+    el.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); wizardNext(); } };
+    host.appendChild(el);
+    setTimeout(() => el.focus(), 50);
+  } else if (q.type === 'number' || q.type === 'currency') {
+    const wrap = q.type === 'currency' ? document.createElement('div') : null;
+    if (wrap) {
+      wrap.className = 'currency-wrap';
+      const sym = document.createElement('span');
+      sym.className = 'currency-sym'; sym.textContent = '$';
+      wrap.appendChild(sym);
+    }
+    const el = document.createElement('input');
+    el.type = 'text'; el.inputMode = 'numeric';
+    el.placeholder = q.type === 'currency' ? '0' : 'Enter a number';
+    el.value = fmtNum(cur);
+    el.oninput = () => {
+      state.answers[q.id] = q.type === 'currency' ? parseFloat10(el.value) : parseInt10(el.value);
+      el.value = fmtNum(state.answers[q.id]);
+      wizardUpdateNext();
+    };
+    el.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); wizardNext(); } };
+    if (wrap) { wrap.appendChild(el); host.appendChild(wrap); } else { host.appendChild(el); }
+    setTimeout(() => el.focus(), 50);
+  } else if (q.type === 'select') {
+    const el = document.createElement('select');
+    el.innerHTML = `<option value="">Choose one...</option>` + q.options.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+    el.value = cur ?? '';
+    el.onchange = () => { state.answers[q.id] = el.value || null; wizardUpdateNext(); };
+    host.appendChild(el);
+  } else if (q.type === 'multiselect') {
+    const grid = document.createElement('div');
+    grid.className = 'multi-grid';
+    const selected = new Set(cur ?? []);
+    for (const opt of q.options) {
+      const label = document.createElement('label');
+      label.className = 'multi-opt' + (selected.has(opt) ? ' checked' : '');
+      const box = document.createElement('input');
+      box.type = 'checkbox'; box.checked = selected.has(opt);
+      box.onchange = () => {
+        if (box.checked) selected.add(opt); else selected.delete(opt);
+        label.classList.toggle('checked', box.checked);
+        state.answers[q.id] = selected.size ? Array.from(selected) : null;
+        wizardUpdateNext();
+      };
+      label.appendChild(box);
+      label.appendChild(document.createTextNode(opt));
+      grid.appendChild(label);
+    }
+    host.appendChild(grid);
+  } else if (q.type === 'boolean') {
+    const row = document.createElement('div');
+    row.className = 'bool-row';
+    for (const v of [true, false]) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'bool-btn' + (cur === v ? ' selected' : '');
+      b.textContent = v ? 'Yes' : 'No';
+      b.onclick = () => { state.answers[q.id] = v; renderWizardInput(q); wizardUpdateNext(); };
+      row.appendChild(b);
+    }
+    host.appendChild(row);
+  }
+}
+
+function wizardUpdateNext() {
+  const q = WIZARD_QUESTIONS[state.wizardIndex];
+  const v = state.answers[q.id];
+  $('#btn-next').disabled = q.required && (v == null || v === '');
+}
+
+function wizardNext() {
+  const q = WIZARD_QUESTIONS[state.wizardIndex];
+  const v = state.answers[q.id];
+  if (q.required && (v == null || v === '')) return;
+  if (state.wizardIndex === WIZARD_QUESTIONS.length - 1) { renderWizardCompletion(); return; }
+  if (q.id === 'has_prior_year' && v !== true) {
+    const ns = WIZARD_QUESTIONS.findIndex(qq => qq.step === q.step + 1);
+    if (ns !== -1) { state.wizardIndex = ns; renderQuestion(); return; }
+  }
+  state.wizardIndex = Math.min(WIZARD_QUESTIONS.length - 1, state.wizardIndex + 1);
+  renderQuestion();
+}
+
+function wizardBack() {
+  state.wizardIndex = Math.max(0, state.wizardIndex - 1);
+  renderQuestion();
+}
+
+function qualifyLevel(a) {
+  const has = (k) => a[k] != null && a[k] !== '';
+  const base = has('company_name') && has('industry') && has('revenue') && has('total_it_spend') && has('transformation_status');
+  const std = base && has('it_opex') && has('it_capex') && has('employee_count') && has('it_fte_count');
+  if (std) return 'Standard Diagnostic';
+  if (base) return 'Quick Read';
+  return 'Incomplete — more inputs needed';
+}
+
+function renderWizardCompletion() {
+  $('#q-card').classList.add('hide');
+  $('.nav-row').classList.add('hide');
+  $('.progress-wrap').style.display = 'none';
+  const a = state.answers;
+  const level = qualifyLevel(a);
+  const createCall = { company_name: a.company_name, industry_gics_group: a.industry };
+  const payload = { analysis_id: '<paste-from-create_analysis>' };
+  const set = (k, v) => { if (v != null && v !== '') payload[k] = v; };
+  set('revenue', a.revenue);
+  set('total_it_spend', a.total_it_spend);
+  set('it_opex_spend', a.it_opex);
+  set('it_capex_spend', a.it_capex);
+  set('it_da_spend', a.it_da);
+  set('employee_count', a.employee_count);
+  set('it_fte_count', a.it_fte_count);
+  set('contractor_count', a.contractor_count);
+  set('contractor_spend', a.contractor_spend);
+  set('fiscal_year_label', a.fiscal_year_label);
+  set('transformation_status', a.transformation_status);
+  set('transformation_type', a.transformation_types);
+  set('transformation_spend_estimate', a.transformation_spend);
+  set('roadmap_available', a.roadmap_available);
+  set('business_model', a.business_model);
+  set('regulatory_complexity', a.regulatory_complexity);
+  set('operating_complexity', a.operating_complexity);
+  set('pricing_premium_complexity', a.pricing_complexity);
+
+  const view = $('#completion-view');
+  view.classList.remove('hide');
+  view.innerHTML = `
+    <div class="summary-card">
+      <span class="wm-overline">Qualification</span>
+      <h2 style="margin:4px 0 4px;font-size:20px">${escapeHtml(a.company_name || 'Unnamed company')}</h2>
+      <span class="wm-badge wm-badge-primary">${escapeHtml(level)}</span>
+    </div>
+    <div class="summary-card">
+      <span class="wm-overline">Step 1 · create_analysis</span>
+      <pre class="payload" id="p1">${escapeHtml(JSON.stringify(createCall, null, 2))}</pre>
+      <button class="copy-btn" data-target="p1">Copy JSON</button>
+    </div>
+    <div class="summary-card">
+      <span class="wm-overline">Step 2 · submit_intake</span>
+      <pre class="payload" id="p2">${escapeHtml(JSON.stringify(payload, null, 2))}</pre>
+      <button class="copy-btn" data-target="p2">Copy JSON</button>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-outline" id="btn-restart">Start over</button>
+      <button class="btn btn-outline" data-view="new">Back to New Analysis</button>
+    </div>
+  `;
+  view.querySelectorAll('.copy-btn').forEach(b => b.onclick = () => {
+    const pre = document.getElementById(b.dataset.target);
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      const prev = b.textContent;
+      b.textContent = 'Copied!';
+      setTimeout(() => b.textContent = prev, 1500);
+    });
+  });
+  $('#btn-restart').onclick = () => renderWizardView();
+}
+
+/* ======= views-form.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// View: Simple Form — mirrors src/app/analysis/[id]/form/page.tsx
+// ══════════════════════════════════════════════════════════════
+function renderFormView() {
+  // reset state for this view
+  state.formStep = 0;
+  state.formPriorExpanded = false;
+  state.formData = {
+    company: {},
+    currentYear: { fiscal_year_label: 'Current Fiscal Year' },
+    priorYear: { fiscal_year_label: 'Last Fiscal Year' },
+    workforce: {},
+    transformation: {},
+    files: {},
+  };
+
+  const host = document.getElementById('view-form');
+  host.innerHTML = `
+    <button class="back-link" data-view="new" type="button">
+      ${icoSvg(SVG.back)}
+      Back to New Analysis
+    </button>
+    <div style="margin-top:16px">
+      <h1 class="page-title">IT Strategy Diagnostic</h1>
+      <p class="page-sub">Complete each section to build your diagnostic profile.</p>
+    </div>
+    <div class="level-banner" style="margin-top:24px">
+      <div class="bicon">${icoSvg(SVG.gauge)}</div>
+      <div class="btxt">
+        <div class="t">Target: ${escapeHtml(state.selectedLevel || 'Standard Diagnostic')}</div>
+        <div class="s">Provide all required fields to qualify for this diagnostic level.</div>
+      </div>
+    </div>
+    <nav class="step-nav" id="form-step-nav"></nav>
+    <div class="panel" id="form-panel"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" id="form-back" disabled>
+        ${icoSvg(SVG.chevL)}
+        Back
+      </button>
+      <button class="btn btn-primary" id="form-next">
+        Next ${icoSvg(SVG.chevR)}
+      </button>
+    </div>
+  `;
+  $('#form-back').onclick = () => { if (state.formStep > 0) { state.formStep--; renderFormBody(); } };
+  $('#form-next').onclick = () => {
+    if (state.formStep === FORM_STEPS.length - 1) {
+      showView('review');
+    } else {
+      state.formStep++;
+      renderFormBody();
+    }
+  };
+  renderFormBody();
+}
+
+function renderFormBody() {
+  renderFormStepNav();
+  renderFormPanel();
+  $('#form-back').disabled = state.formStep === 0;
+  const isLast = state.formStep === FORM_STEPS.length - 1;
+  $('#form-next').innerHTML = isLast
+    ? `${icoSvg(SVG.check)} Review`
+    : `Next ${icoSvg(SVG.chevR)}`;
+}
+
+function renderFormStepNav() {
+  const host = $('#form-step-nav');
+  host.innerHTML = '';
+  FORM_STEPS.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'step-nav-item';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'step-nav-btn' + (i === state.formStep ? ' active' : i < state.formStep ? ' complete' : '');
+    btn.innerHTML = `
+      <div class="step-circle">${i < state.formStep ? icoSvg(SVG.check) : String(i+1)}</div>
+      <span class="step-label">${escapeHtml(s.label)}${s.optional ? '<span class="opt">*</span>' : ''}</span>
+    `;
+    btn.onclick = () => { state.formStep = i; renderFormBody(); };
+    item.appendChild(btn);
+    if (i < FORM_STEPS.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'step-line' + (i < state.formStep ? ' complete' : '');
+      item.appendChild(line);
+    }
+    host.appendChild(item);
+  });
+}
+
+// ── Panels — mirror the 4 intake components
+function renderFormPanel() {
+  const host = $('#form-panel');
+  const step = FORM_STEPS[state.formStep];
+  if (step.key === 'company') renderPanelCompany(host);
+  else if (step.key === 'financial') renderPanelFinancial(host, 'currentYear', 0);
+  else if (step.key === 'prior') renderPanelPrior(host);
+  else if (step.key === 'workforce') renderPanelWorkforce(host);
+  else if (step.key === 'transformation') renderPanelTransformation(host);
+  else if (step.key === 'files') renderPanelFiles(host);
+}
+
+function renderPanelCompany(host) {
+  const d = state.formData.company;
+  host.innerHTML = `
+    <h3>Company Profile</h3>
+    <p class="panel-sub">Basic information about the company being assessed.</p>
+    <div class="stack-4">
+      <div>
+        <label class="field-label" for="f-company-name">Company Name<span class="req">*</span></label>
+        <input id="f-company-name" type="text" placeholder="Enter company name" value="${escapeHtml(d.company_name ?? '')}">
+      </div>
+      <div>
+        <label class="field-label">Industry (GICS Sector)<span class="req">*</span></label>
+        <select id="f-industry">
+          <option value="">Select industry sector</option>
+          ${GICS_GROUPS.map(g => `<option value="${escapeHtml(g)}" ${d.industry_gics_group === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Business Model</label>
+        <select id="f-biz">
+          <option value="">Select business model (optional)</option>
+          ${BUSINESS_MODELS.map(m => `<option value="${escapeHtml(m)}" ${d.business_model === m ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="panel-section">
+        <h4>Complexity Assessment</h4>
+        <div class="field-grid-3">
+          ${complexitySelect('f-reg', 'Regulatory Complexity', d.regulatory_complexity)}
+          ${complexitySelect('f-ops', 'Operating Complexity', d.operating_complexity)}
+          ${complexitySelect('f-price', 'Pricing Complexity', d.pricing_premium_complexity)}
+        </div>
+      </div>
+      <div>
+        <label class="field-label" for="f-notes">Complexity Notes</label>
+        <textarea id="f-notes" rows="3" placeholder="Any additional context on complexity drivers (optional)">${escapeHtml(d.complexity_notes ?? '')}</textarea>
+      </div>
+    </div>
+  `;
+  $('#f-company-name', host).oninput = (e) => d.company_name = e.target.value;
+  $('#f-industry', host).onchange = (e) => d.industry_gics_group = e.target.value || null;
+  $('#f-biz', host).onchange = (e) => d.business_model = e.target.value || null;
+  $('#f-reg', host).onchange = (e) => d.regulatory_complexity = e.target.value || null;
+  $('#f-ops', host).onchange = (e) => d.operating_complexity = e.target.value || null;
+  $('#f-price', host).onchange = (e) => d.pricing_premium_complexity = e.target.value || null;
+  $('#f-notes', host).oninput = (e) => d.complexity_notes = e.target.value || null;
+}
+
+function complexitySelect(id, label, val) {
+  return `
+    <div>
+      <label class="field-label" style="font-size:12px">${escapeHtml(label)}</label>
+      <select id="${id}">
+        <option value="">Select</option>
+        ${COMPLEXITY_LEVELS.map(l => `<option value="${escapeHtml(l)}" ${val === l ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+      </select>
+    </div>
+  `;
+}
+
+function renderPanelFinancial(host, key, yearIndex) {
+  const d = state.formData[key];
+  host.innerHTML = `
+    <h3>Financial Baseline${yearIndex > 0 ? ` (Year ${yearIndex + 1})` : ''}</h3>
+    <p class="panel-sub">IT financial data for benchmarking. Enter values in USD.</p>
+    <div class="stack-4">
+      <div>
+        <label class="field-label">Fiscal Year<span class="req">*</span></label>
+        <select id="f-fy">
+          <option value="">Select fiscal year</option>
+          ${FISCAL_YEAR_LABELS.map(l => `<option value="${escapeHtml(l)}" ${d.fiscal_year_label === l ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-grid-2">
+        ${currencyInput('f-rev', 'Revenue', d.revenue, true)}
+        ${currencyInput('f-its', 'Total IT Spend', d.total_it_spend, true)}
+      </div>
+      <div class="panel-section">
+        <h4>IT Spend Breakdown</h4>
+        <div class="field-grid-3">
+          ${currencyInput('f-opex', 'IT OpEx', d.it_opex_spend)}
+          ${currencyInput('f-capex', 'IT CapEx', d.it_capex_spend)}
+          ${currencyInput('f-da', 'IT D&A', d.it_da_spend)}
+        </div>
+      </div>
+    </div>
+  `;
+  $('#f-fy', host).onchange = (e) => d.fiscal_year_label = e.target.value || null;
+  bindCurrency(host, '#f-rev', (v) => d.revenue = v);
+  bindCurrency(host, '#f-its', (v) => d.total_it_spend = v);
+  bindCurrency(host, '#f-opex', (v) => d.it_opex_spend = v);
+  bindCurrency(host, '#f-capex', (v) => d.it_capex_spend = v);
+  bindCurrency(host, '#f-da', (v) => d.it_da_spend = v);
+}
+
+function currencyInput(id, label, val, required) {
+  return `
+    <div>
+      <label class="field-label" style="font-size:12px">${escapeHtml(label)}${required ? '<span class="req">*</span>' : ''}</label>
+      <div class="currency-wrap">
+        <span class="currency-sym">$</span>
+        <input id="${id}" type="text" inputmode="numeric" placeholder="0" value="${fmtNum(val)}">
+      </div>
+    </div>
+  `;
+}
+function numberInput(id, label, val, required, placeholder) {
+  return `
+    <div>
+      <label class="field-label" style="font-size:12px">${escapeHtml(label)}${required ? '<span class="req">*</span>' : ''}</label>
+      <input id="${id}" type="text" inputmode="numeric" placeholder="${placeholder || 'Enter a number'}" value="${fmtNum(val)}">
+    </div>
+  `;
+}
+function bindCurrency(host, sel, setter) {
+  const el = host.querySelector(sel);
+  if (!el) return;
+  el.oninput = () => { const v = parseFloat10(el.value); setter(v); el.value = fmtNum(v); };
+}
+function bindNumber(host, sel, setter) {
+  const el = host.querySelector(sel);
+  if (!el) return;
+  el.oninput = () => { const v = parseInt10(el.value); setter(v); el.value = fmtNum(v); };
+}
+
+function renderPanelPrior(host) {
+  host.innerHTML = `
+    <div class="row-between" style="margin-bottom:16px">
+      <div>
+        <h3 style="margin:0 0 4px">Prior Year Data</h3>
+        <p class="panel-sub" style="margin:0">Optional. Providing prior year data enables trend analysis.</p>
+      </div>
+      <button class="btn btn-outline btn-sm" id="f-prior-toggle">${state.formPriorExpanded ? 'Collapse' : 'Add Prior Year'}</button>
+    </div>
+    <div id="f-prior-content"></div>
+  `;
+  $('#f-prior-toggle', host).onclick = () => {
+    state.formPriorExpanded = !state.formPriorExpanded;
+    renderPanelPrior(host);
+  };
+  if (state.formPriorExpanded) {
+    renderPanelFinancial($('#f-prior-content', host), 'priorYear', 1);
+  }
+}
+
+function renderPanelWorkforce(host) {
+  const d = state.formData.workforce;
+  host.innerHTML = `
+    <h3>Workforce &amp; Labor</h3>
+    <p class="panel-sub">Headcount and labor cost data for IT benchmarking.</p>
+    <div class="stack-4">
+      <div class="field-grid-2">
+        ${numberInput('f-emp', 'Total Employee Count', d.employee_count, true, 'e.g. 5,000')}
+        ${numberInput('f-itfte', 'IT FTE Count', d.it_fte_count, true, 'e.g. 250')}
+      </div>
+      <div class="panel-section">
+        <h4>Contractor &amp; Outsourcing Detail<span class="opt">(optional)</span></h4>
+        <div class="field-grid-2">
+          ${numberInput('f-con', 'Contractor Count', d.contractor_count, false, 'e.g. 100')}
+          ${currencyInput('f-conSpend', 'Contractor Spend', d.contractor_spend)}
+          ${currencyInput('f-outSpend', 'Outsourced Spend', d.outsourced_spend)}
+          ${currencyInput('f-intLabor', 'Internal Labor Spend', d.internal_labor_spend)}
+        </div>
+      </div>
+    </div>
+  `;
+  bindNumber(host, '#f-emp', (v) => d.employee_count = v);
+  bindNumber(host, '#f-itfte', (v) => d.it_fte_count = v);
+  bindNumber(host, '#f-con', (v) => d.contractor_count = v);
+  bindCurrency(host, '#f-conSpend', (v) => d.contractor_spend = v);
+  bindCurrency(host, '#f-outSpend', (v) => d.outsourced_spend = v);
+  bindCurrency(host, '#f-intLabor', (v) => d.internal_labor_spend = v);
+}
+
+function renderPanelTransformation(host) {
+  const d = state.formData.transformation;
+  host.innerHTML = `
+    <h3>Transformation Context</h3>
+    <p class="panel-sub">Active or planned transformation programs that impact IT spend.</p>
+    <div class="stack-4">
+      <div>
+        <label class="field-label">Is a transformation currently active?</label>
+        <select id="f-tstatus">
+          <option value="">Select status</option>
+          ${TRANSFORMATION_STATUS.map(s => `<option value="${escapeHtml(s)}" ${d.transformation_status === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Transformation Types</label>
+        <div class="chkgrid-5" id="f-ttypes"></div>
+      </div>
+      <div class="field-grid-2">
+        ${currencyInput('f-tspend', 'Transformation Spend Estimate', d.transformation_spend_estimate)}
+        <div>
+          <label class="field-label" style="font-size:12px">Roll-off Timing</label>
+          <input id="f-troll" type="text" placeholder='e.g. "Q4 2026" or "18 months"' value="${escapeHtml(d.transformation_rolloff_timing ?? '')}">
+        </div>
+      </div>
+      <div>
+        <label class="field-label">Roadmap Available?</label>
+        <select id="f-roadmap">
+          <option value="">Select</option>
+          <option value="yes" ${d.roadmap_available === true ? 'selected' : ''}>Yes</option>
+          <option value="no"  ${d.roadmap_available === false ? 'selected' : ''}>No</option>
+        </select>
+      </div>
+    </div>
+  `;
+  $('#f-tstatus', host).onchange = (e) => d.transformation_status = e.target.value || null;
+  bindCurrency(host, '#f-tspend', (v) => d.transformation_spend_estimate = v);
+  $('#f-troll', host).oninput = (e) => d.transformation_rolloff_timing = e.target.value || null;
+  $('#f-roadmap', host).onchange = (e) => {
+    const v = e.target.value;
+    d.roadmap_available = v === 'yes' ? true : v === 'no' ? false : null;
+  };
+
+  const grid = $('#f-ttypes', host);
+  const selected = new Set(d.transformation_type ?? []);
+  TRANSFORMATION_TYPES.forEach(t => {
+    const label = document.createElement('label');
+    label.className = 'multi-opt' + (selected.has(t) ? ' checked' : '');
+    const box = document.createElement('input');
+    box.type = 'checkbox'; box.checked = selected.has(t);
+    box.onchange = () => {
+      if (box.checked) selected.add(t); else selected.delete(t);
+      label.classList.toggle('checked', box.checked);
+      d.transformation_type = selected.size ? Array.from(selected) : null;
+    };
+    label.appendChild(box);
+    label.appendChild(document.createTextNode(t));
+    grid.appendChild(label);
+  });
+}
+
+function renderPanelFiles(host) {
+  host.innerHTML = `
+    <h3>File Upload</h3>
+    <p class="panel-sub">Upload supporting documents for automated data extraction. Accepts .xlsx, .xls, .csv, and .pdf files.</p>
+    <div class="dropzone-grid" id="f-dropzones"></div>
+  `;
+  const zones = $('#f-dropzones', host);
+  FILE_ZONES.forEach(zone => zones.appendChild(makeDropzone(zone, state.formData.files, 'form')));
+}
+
+function renderFormCompletion() {
+  const d = state.formData;
+  const companyName = d.company.company_name || 'Unnamed company';
+  const host = document.getElementById('view-form');
+  host.innerHTML = `
+    <button class="back-link" data-view="new" type="button">${icoSvg(SVG.back)} Back to New Analysis</button>
+    <div style="margin-top:24px">
+      <span class="wm-overline">Review</span>
+      <h1 class="page-title">${escapeHtml(companyName)}</h1>
+      <p class="page-sub">Your intake is captured. Paste the MCP calls below to run the analysis.</p>
+    </div>
+    <div class="summary-card">
+      <span class="wm-overline">Summary</span>
+      <div class="data-grid" style="margin-top:12px">
+        ${summaryPill('Industry', d.company.industry_gics_group)}
+        ${summaryPill('Business model', d.company.business_model)}
+        ${summaryPill('Revenue', d.currentYear.revenue != null ? '$' + fmtNum(d.currentYear.revenue) : null)}
+        ${summaryPill('Total IT spend', d.currentYear.total_it_spend != null ? '$' + fmtNum(d.currentYear.total_it_spend) : null)}
+        ${summaryPill('IT OpEx', d.currentYear.it_opex_spend != null ? '$' + fmtNum(d.currentYear.it_opex_spend) : null)}
+        ${summaryPill('IT CapEx', d.currentYear.it_capex_spend != null ? '$' + fmtNum(d.currentYear.it_capex_spend) : null)}
+        ${summaryPill('Employees', d.workforce.employee_count)}
+        ${summaryPill('IT FTEs', d.workforce.it_fte_count)}
+        ${summaryPill('Transformation', d.transformation.transformation_status)}
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-outline" data-view="new">Back to New Analysis</button>
+      <button class="btn btn-primary" id="form-edit">Edit answers</button>
+    </div>
+  `;
+  $('#form-edit').onclick = () => { renderFormView(); };
+}
+function summaryPill(label, val) {
+  if (val == null || val === '') return '';
+  return `<div class="data-pill"><span class="label">${escapeHtml(label)}</span><span class="value">${escapeHtml(String(val))}</span></div>`;
+}
+
+/* ======= views-filedrop.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// View: File Drop — mirrors src/app/analysis/[id]/file-drop/page.tsx
+// Note: real xlsx parsing is stubbed — the UI mirrors the flow.
+// ══════════════════════════════════════════════════════════════
+function renderFileDropView() {
+  state.fdStep = 'upload';
+  state.fdFiles = {};
+  state.fdParsed = {};
+  state.fdParseStatus = 'idle';
+  state.fdParseMessages = [];
+  state.fdCompany = {};
+
+  const host = document.getElementById('view-filedrop');
+  host.innerHTML = `
+    <button class="back-link" data-view="new" type="button">
+      ${icoSvg(SVG.back)}
+      Back to New Analysis
+    </button>
+    <div style="margin-top:24px">
+      <span class="wm-overline">File Drop</span>
+      <h1 class="page-title">Upload Your Data</h1>
+      <p class="page-sub">Upload spreadsheets with IT financials, vendor lists, org charts, or roadmaps. We'll extract what we can and let you review before running the diagnostic.</p>
+    </div>
+    <div class="level-banner" style="margin-top:24px">
+      <div class="bicon">${icoSvg(SVG.gauge)}</div>
+      <div class="btxt">
+        <div class="t">Target: ${escapeHtml(state.selectedLevel || 'Standard Diagnostic')}</div>
+        <div class="s">Upload one or more files below to extract data automatically.</div>
+      </div>
+    </div>
+    <nav class="fdstep-nav" id="fd-step-nav"></nav>
+    <div id="fd-body"></div>
+  `;
+  renderFdStepNav();
+  renderFdBody();
+}
+
+function renderFdStepNav() {
+  const host = $('#fd-step-nav');
+  host.innerHTML = '';
+  FILEDROP_STEPS.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'fdstep-item';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    const activeIdx = FILEDROP_STEPS.findIndex(x => x.key === state.fdStep);
+    const isActive = s.key === state.fdStep;
+    const isComplete = i < activeIdx;
+    btn.className = 'fdstep-btn' + (isActive ? ' active' : isComplete ? ' complete' : '');
+    btn.innerHTML = `
+      <div class="fdstep-circle">${i + 1}</div>
+      <span>${escapeHtml(s.label)}</span>
+    `;
+    btn.onclick = () => { if (isComplete) { state.fdStep = s.key; renderFdStepNav(); renderFdBody(); } };
+    item.appendChild(btn);
+    if (i < FILEDROP_STEPS.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'fdstep-line' + (isComplete ? ' complete' : '');
+      item.appendChild(line);
+    }
+    host.appendChild(item);
+  });
+}
+
+function renderFdBody() {
+  const host = $('#fd-body');
+  if (state.fdStep === 'upload') renderFdUpload(host);
+  else if (state.fdStep === 'company') renderFdCompany(host);
+  else if (state.fdStep === 'review') renderFdReview(host);
+}
+
+function renderFdUpload(host) {
+  const fileCount = Object.values(state.fdFiles).filter(Boolean).length;
+  host.innerHTML = `
+    <div class="panel"><div class="dropzone-grid" id="fd-dropzones"></div></div>
+    <div id="fd-parse-ui" style="margin-top:20px"></div>
+    ${fileCount === 0 ? `
+      <div class="row" style="justify-content:center;margin-top:16px;color:var(--muted-foreground);font-size:13px;gap:4px">
+        ${icoSvg(SVG.alert, 'alert-ico')}
+        Drop at least one file above to get started, or
+        <button class="back-link" style="color:var(--wm-blue);font-weight:500" type="button" id="fd-skip">skip to manual entry</button>
+      </div>
+    ` : ''}
+  `;
+  const zones = $('#fd-dropzones', host);
+  FILE_ZONES.forEach(zone => zones.appendChild(makeDropzone(zone, state.fdFiles, 'filedrop')));
+
+  const parseUi = $('#fd-parse-ui', host);
+  if (state.fdParseStatus === 'idle' && fileCount > 0) {
+    parseUi.innerHTML = `<div class="row" style="justify-content:center"><button class="btn btn-primary" id="fd-parse">${icoSvg(SVG.fileSheet)} Parse ${fileCount} File${fileCount !== 1 ? 's' : ''}</button></div>`;
+    $('#fd-parse', parseUi).onclick = fdHandleParse;
+  } else if (state.fdParseStatus === 'parsing') {
+    parseUi.innerHTML = `<div class="row" style="justify-content:center;color:var(--muted-foreground);padding:16px">${icoSvg(SVG.loader)} Parsing files...</div>`;
+  } else if (state.fdParseStatus === 'done') {
+    parseUi.innerHTML = `
+      <div class="parse-results">
+        <h4>Parse Results</h4>
+        ${state.fdParseMessages.map(m => `<p class="parse-line">${escapeHtml(m)}</p>`).join('')}
+      </div>
+      ${Object.keys(state.fdParsed).length > 0 ? `
+        <div class="panel" style="margin-top:16px">
+          <h4 style="margin:0 0 12px;font-size:13px;font-weight:600">Extracted Data</h4>
+          <div class="data-grid">
+            ${Object.entries(state.fdParsed).map(([k, v]) => `
+              <div class="data-pill">
+                <span class="label">${escapeHtml(k.replace(/_/g, ' '))}</span>
+                <span class="value">${typeof v === 'number' ? (v >= 1000 ? '$' + (v/1e6).toFixed(1) + 'M' : fmtNum(v)) : escapeHtml(String(v))}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      <div class="row" style="justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-primary" id="fd-next1">Next: Company Profile ${icoSvg(SVG.chevR)}</button>
+      </div>
+    `;
+    $('#fd-next1', parseUi).onclick = () => { state.fdStep = 'company'; renderFdStepNav(); renderFdBody(); };
+  }
+
+  const skip = $('#fd-skip', host);
+  if (skip) skip.onclick = () => { state.fdStep = 'company'; renderFdStepNav(); renderFdBody(); };
+}
+
+// Stubbed parser — real implementation uses xlsx lib (see file-drop/page.tsx)
+function fdHandleParse() {
+  state.fdParseStatus = 'parsing';
+  state.fdParseMessages = [];
+  renderFdBody();
+  setTimeout(() => {
+    const msgs = [];
+    const merged = {};
+    for (const [zone, file] of Object.entries(state.fdFiles)) {
+      if (!file) continue;
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+        // Placeholder — show plausible demo values the real parser would extract
+        msgs.push(`✓ ${zone}: parsed ${file.name} (demo values shown)`);
+        if (zone === 'IT Financials') Object.assign(merged, { revenue: 505000000, total_it_spend: 18400000, it_opex_spend: 12900000, it_capex_spend: 5500000 });
+        if (zone === 'IT FTEs and Contractors') Object.assign(merged, { employee_count: 1600, it_fte_count: 25 });
+      } else if (ext === 'pdf') {
+        msgs.push(`○ ${zone}: PDF uploaded (${file.name}) — manual review needed`);
+      } else {
+        msgs.push(`⚠ ${zone}: unsupported format (${file.name})`);
+      }
+    }
+    const total = Object.keys(merged).length;
+    msgs.push(total > 0
+      ? `\n→ ${total} data point${total !== 1 ? 's' : ''} extracted. Review below before proceeding.`
+      : `\n→ No structured data found. You can enter data manually in the next step.`
+    );
+    state.fdParsed = merged;
+    state.fdParseMessages = msgs;
+    state.fdParseStatus = 'done';
+    renderFdBody();
+  }, 500);
+}
+
+function renderFdCompany(host) {
+  const d = state.fdCompany;
+  host.innerHTML = `
+    <div class="panel">
+      <h3>Company Profile</h3>
+      <p class="panel-sub">Basic information about the company being assessed.</p>
+      <div class="stack-4">
+        <div>
+          <label class="field-label" for="fd-name">Company Name<span class="req">*</span></label>
+          <input id="fd-name" type="text" placeholder="Enter company name" value="${escapeHtml(d.company_name ?? '')}">
+        </div>
+        <div>
+          <label class="field-label">Industry (GICS Sector)<span class="req">*</span></label>
+          <select id="fd-ind">
+            <option value="">Select industry sector</option>
+            ${GICS_GROUPS.map(g => `<option value="${escapeHtml(g)}" ${d.industry_gics_group === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Business Model</label>
+          <select id="fd-biz">
+            <option value="">Select business model (optional)</option>
+            ${BUSINESS_MODELS.map(m => `<option value="${escapeHtml(m)}" ${d.business_model === m ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row-between" style="margin-top:16px">
+      <button class="btn btn-outline" id="fd-back1">${icoSvg(SVG.chevL)} Back to Files</button>
+      <button class="btn btn-primary" id="fd-next2" disabled>Next: Review ${icoSvg(SVG.chevR)}</button>
+    </div>
+  `;
+  const refreshNext = () => { $('#fd-next2').disabled = !d.company_name; };
+  $('#fd-name', host).oninput = (e) => { d.company_name = e.target.value; refreshNext(); };
+  $('#fd-ind', host).onchange = (e) => { d.industry_gics_group = e.target.value || null; };
+  $('#fd-biz', host).onchange = (e) => { d.business_model = e.target.value || null; };
+  $('#fd-back1', host).onclick = () => { state.fdStep = 'upload'; renderFdStepNav(); renderFdBody(); };
+  $('#fd-next2', host).onclick = () => { state.fdStep = 'review'; renderFdStepNav(); renderFdBody(); };
+  refreshNext();
+}
+
+function renderFdReview(host) {
+  const d = state.fdCompany;
+  const parsedCount = Object.keys(state.fdParsed).length;
+  const fileCount = Object.values(state.fdFiles).filter(Boolean).length;
+  host.innerHTML = `
+    <div class="panel">
+      <div class="row" style="margin-bottom:12px;color:var(--wm-navy)">
+        ${icoSvg(SVG.building)}
+        <h3 style="margin:0;font-size:16px">Company</h3>
+      </div>
+      <div class="data-grid">
+        <div class="data-pill"><span class="label">Name</span><span class="value">${escapeHtml(d.company_name || '—')}</span></div>
+        <div class="data-pill"><span class="label">Industry</span><span class="value">${escapeHtml(d.industry_gics_group || '—')}</span></div>
+        ${d.business_model ? `<div class="data-pill"><span class="label">Business model</span><span class="value">${escapeHtml(d.business_model)}</span></div>` : ''}
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div class="row" style="margin-bottom:12px;color:var(--wm-navy)">
+        ${icoSvg(SVG.upload)}
+        <h3 style="margin:0;font-size:16px">Extracted Data (${parsedCount} field${parsedCount !== 1 ? 's' : ''})</h3>
+      </div>
+      ${parsedCount > 0 ? `
+        <div class="data-grid">
+          ${Object.entries(state.fdParsed).map(([k, v]) => `
+            <div class="data-pill">
+              <span class="label">${escapeHtml(k.replace(/_/g, ' '))}</span>
+              <span class="value">${typeof v === 'number' ? (v >= 1000 ? '$' + (v/1e6).toFixed(1) + 'M' : fmtNum(v)) : escapeHtml(String(v))}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="color:var(--muted-foreground);margin:0;font-size:13px">No data extracted from files. You can add data manually after submission.</p>'}
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div class="row" style="margin-bottom:12px;color:var(--wm-navy)">
+        ${icoSvg(SVG.fileSheet)}
+        <h3 style="margin:0;font-size:16px">Files (${fileCount} uploaded)</h3>
+      </div>
+      ${fileCount > 0 ? `
+        <div class="stack-2">
+          ${Object.entries(state.fdFiles).filter(([, f]) => f).map(([zone, file]) => `
+            <div class="data-pill">
+              <span class="label">${escapeHtml(zone)}</span>
+              <span class="value">${escapeHtml(file.name)}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="color:var(--muted-foreground);margin:0;font-size:13px">No files uploaded.</p>'}
+    </div>
+    <div class="row-between" style="margin-top:16px">
+      <button class="btn btn-outline" id="fd-back2">${icoSvg(SVG.chevL)} Back</button>
+      <button class="btn btn-primary" id="fd-submit">Submit &amp; Review ${icoSvg(SVG.chevR)}</button>
+    </div>
+  `;
+  $('#fd-back2', host).onclick = () => { state.fdStep = 'company'; renderFdStepNav(); renderFdBody(); };
+  $('#fd-submit', host).onclick = () => showView('review');
+}
+
+// ══════════════════════════════════════════════════════════════
+// Shared dropzone component — used by Form step 6 and File Drop
+// ══════════════════════════════════════════════════════════════
+function makeDropzone(zone, fileStore, contextKey) {
+  const el = document.createElement('div');
+  el.className = 'dropzone';
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx,.xls,.csv,.pdf';
+  input.style.display = 'none';
+
+  const refresh = () => {
+    const file = fileStore[zone] || null;
+    el.innerHTML = '';
+    if (file) {
+      el.classList.add('has-file');
+      el.innerHTML = `
+        ${icoSvg(SVG.fileSheet, 'dropzone-icon')}
+        <div>
+          <div class="dropzone-title" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(file.name)}</div>
+          <div class="dropzone-hint">${(file.size / 1024).toFixed(1)} KB</div>
+        </div>
+        <button class="dropzone-remove" type="button" title="Remove">${icoSvg(SVG.x)}</button>
+      `;
+      el.querySelector('.dropzone-remove').onclick = (e) => { e.stopPropagation(); fileStore[zone] = null; refreshContainer(); };
+    } else {
+      el.classList.remove('has-file');
+      el.innerHTML = `
+        ${icoSvg(SVG.upload, 'dropzone-icon')}
+        <div>
+          <div class="dropzone-title">${escapeHtml(zone)}</div>
+          <div class="dropzone-hint">Drop file here or click to browse</div>
+        </div>
+      `;
+    }
+    el.appendChild(input);
+  };
+
+  const refreshContainer = () => {
+    // For file-drop view, re-render the whole body so buttons/count update.
+    // For the form step, just refresh this tile.
+    if (contextKey === 'filedrop') renderFdBody();
+    else refresh();
+  };
+
+  el.onclick = () => input.click();
+  el.ondragover = (e) => { e.preventDefault(); el.classList.add('drag'); };
+  el.ondragleave = () => el.classList.remove('drag');
+  el.ondrop = (e) => {
+    e.preventDefault();
+    el.classList.remove('drag');
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) { fileStore[zone] = f; refreshContainer(); }
+  };
+  input.onchange = () => {
+    const f = input.files && input.files[0];
+    if (f) { fileStore[zone] = f; refreshContainer(); }
+  };
+
+  refresh();
+  return el;
+}
+
+/* ======= views-review-results.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// View: Review — mirrors src/app/analysis/[id]/review/page.tsx
+// ══════════════════════════════════════════════════════════════
+function renderReviewView() {
+  // Build review rows from whatever the user has entered in form/wizard/filedrop
+  const src = gatherIntakeForReview();
+  const rows = buildReviewRows(src);
+  const confirmed = rows.filter(r => r.provided === 'Confirmed').length;
+  const missing = rows.length - confirmed;
+  const level = qualifyFromRows(rows);
+  const companyName = src.company.company_name || 'Unnamed Analysis';
+
+  const host = document.getElementById('view-review');
+  host.innerHTML = `
+    <button class="back-link" data-view="new" type="button">
+      ${icoSvg(SVG.back)}
+      Back to New Analysis
+    </button>
+    <div style="margin-top:16px">
+      <span class="wm-overline">Review</span>
+      <h1 class="page-title">Review: ${escapeHtml(companyName)}</h1>
+      <p class="page-sub">Review your inputs before running the analysis. ${confirmed} confirmed, ${missing} missing.</p>
+    </div>
+
+    <div class="panel" style="margin-top:24px">
+      <div class="row-between" style="margin-bottom:12px">
+        <div>
+          <span class="wm-overline">Qualification</span>
+          <h3 style="margin:4px 0 0;font-size:18px">Qualified for: ${escapeHtml(level)}</h3>
+        </div>
+        <span class="wm-badge wm-badge-primary">${escapeHtml(level)}</span>
+      </div>
+      <p class="panel-sub" style="margin:0">Data quality sufficient for this diagnostic depth. Add more fields to unlock higher levels.</p>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <div class="row" style="color:var(--wm-navy);margin-bottom:12px">
+        ${icoSvg(SVG.fileSheet)}
+        <h3 style="margin:0;font-size:16px">Confirmed Input Summary</h3>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="review-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Required for</th>
+              <th>Status</th>
+              <th>Value</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>${escapeHtml(r.metric_name)}</td>
+                <td class="tdim">${escapeHtml(r.required_for_level)}</td>
+                <td>
+                  <span class="pill ${r.provided === 'Confirmed' ? 'pill-ok' : 'pill-miss'}">${r.provided}</span>
+                </td>
+                <td class="tmono">${r.value_preview ? escapeHtml(r.value_preview) : '—'}</td>
+                <td class="tdim">${escapeHtml(r.confidence)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <div>
+        <div style="font-size:13px;font-weight:600">Ready to run?</div>
+        <div style="font-size:12px;color:var(--muted-foreground)">Your data qualifies for <strong>${escapeHtml(level)}</strong>.</div>
+      </div>
+      <button class="btn btn-primary" id="review-run">
+        ${icoSvg(SVG.chevR)}
+        Confirm &amp; Run Analysis
+      </button>
+    </div>
+  `;
+  $('#review-run', host).onclick = () => showView('results');
+}
+
+// Collect intake from whichever path the user went down
+function gatherIntakeForReview() {
+  // Prefer form data if present, otherwise use wizard answers
+  const f = state.formData;
+  if (f && (f.company.company_name || f.currentYear.revenue)) {
+    return {
+      company: f.company,
+      fy: f.currentYear,
+      workforce: f.workforce,
+      transformation: f.transformation,
+    };
+  }
+  const a = state.answers || {};
+  // If file-drop was used, use fdCompany + fdParsed
+  if (state.fdCompany && (state.fdCompany.company_name || Object.keys(state.fdParsed || {}).length)) {
+    return {
+      company: state.fdCompany,
+      fy: state.fdParsed || {},
+      workforce: state.fdParsed || {},
+      transformation: {
+        transformation_status: state.fdParsed?.transformation_status,
+        transformation_spend_estimate: state.fdParsed?.transformation_spend_estimate,
+      },
+    };
+  }
+  // Otherwise wizard
+  return {
+    company: {
+      company_name: a.company_name,
+      industry_gics_group: a.industry,
+      business_model: a.business_model,
+      regulatory_complexity: a.regulatory_complexity,
+      operating_complexity: a.operating_complexity,
+      pricing_premium_complexity: a.pricing_complexity,
+    },
+    fy: {
+      revenue: a.revenue,
+      total_it_spend: a.total_it_spend,
+      it_opex_spend: a.it_opex,
+      it_capex_spend: a.it_capex,
+      it_da_spend: a.it_da,
+    },
+    workforce: {
+      employee_count: a.employee_count,
+      it_fte_count: a.it_fte_count,
+      contractor_count: a.contractor_count,
+      contractor_spend: a.contractor_spend,
+    },
+    transformation: {
+      transformation_status: a.transformation_status,
+      transformation_type: a.transformation_types,
+      transformation_spend_estimate: a.transformation_spend,
+      roadmap_available: a.roadmap_available,
+    },
+  };
+}
+
+function buildReviewRows(src) {
+  const { company, fy, workforce, transformation } = src;
+  const rows = [];
+  const add = (name, level, value) => {
+    const provided = value != null && value !== '' && !(Array.isArray(value) && value.length === 0) ? 'Confirmed' : 'Missing';
+    const confidence = provided === 'Confirmed' ? 'High' : 'Low';
+    let preview = null;
+    if (provided === 'Confirmed') {
+      if (typeof value === 'number') {
+        preview = value >= 1000 ? '$' + (value/1e6).toFixed(1) + 'M' : fmtNum(value);
+      } else if (Array.isArray(value)) {
+        preview = value.join(', ');
+      } else if (typeof value === 'boolean') {
+        preview = value ? 'Yes' : 'No';
+      } else {
+        preview = String(value);
+      }
+    }
+    rows.push({ metric_name: name, required_for_level: level, provided, confidence, value_preview: preview });
+  };
+  add('Company name', 'Quick Read', company.company_name);
+  add('Industry (GICS group)', 'Quick Read', company.industry_gics_group);
+  add('Business model', 'Standard Diagnostic', company.business_model);
+  add('Regulatory complexity', 'Standard Diagnostic', company.regulatory_complexity);
+  add('Operating complexity', 'Standard Diagnostic', company.operating_complexity);
+  add('Pricing complexity', 'Standard Diagnostic', company.pricing_premium_complexity);
+  add('Revenue', 'Quick Read', fy.revenue);
+  add('Total IT spend', 'Quick Read', fy.total_it_spend);
+  add('IT OpEx spend', 'Standard Diagnostic', fy.it_opex_spend);
+  add('IT CapEx spend', 'Standard Diagnostic', fy.it_capex_spend);
+  add('Employee count', 'Standard Diagnostic', workforce.employee_count);
+  add('IT FTE count', 'Standard Diagnostic', workforce.it_fte_count);
+  add('Contractor count', 'Full Diagnostic', workforce.contractor_count);
+  add('Contractor spend', 'Full Diagnostic', workforce.contractor_spend);
+  add('Transformation active?', 'Quick Read', transformation.transformation_status);
+  add('Transformation type(s)', 'Standard Diagnostic', transformation.transformation_type);
+  add('Transformation spend estimate', 'Full Diagnostic', transformation.transformation_spend_estimate);
+  add('Roadmap available?', 'Full Diagnostic', transformation.roadmap_available);
+  return rows;
+}
+
+function qualifyFromRows(rows) {
+  const has = (name) => rows.find(r => r.metric_name === name && r.provided === 'Confirmed');
+  const quickRead = has('Company name') && has('Industry (GICS group)') && has('Revenue') && has('Total IT spend') && has('Transformation active?');
+  const standard = quickRead && has('IT OpEx spend') && has('IT CapEx spend') && has('Employee count') && has('IT FTE count');
+  if (standard) return 'Standard Diagnostic';
+  if (quickRead) return 'Quick Read';
+  return 'Incomplete';
+}
+
+// ══════════════════════════════════════════════════════════════
+// View: Results — mirrors src/app/analysis/[id]/results/page.tsx
+// Uses demo data since the real engine doesn't run client-side.
+// ══════════════════════════════════════════════════════════════
+const RESULTS_TABS = [
+  { id: 'summary', label: 'Summary', iconPath: '<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>' },
+  { id: 'benchmark', label: 'Benchmark', iconPath: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>' },
+  { id: 'opportunities', label: 'Opportunities', iconPath: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>' },
+  { id: 'findings', label: 'Findings', iconPath: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>' },
+  { id: 'caveats', label: 'Caveats & QA', iconPath: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' },
+  { id: 'export', label: 'Export', iconPath: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>' },
+];
+
+function renderResultsView() {
+  const companyName = (gatherIntakeForReview().company.company_name) || 'Acme Corp';
+  state.resultsTab = state.resultsTab || 'summary';
+
+  const host = document.getElementById('view-results');
+  host.innerHTML = `
+    <button class="back-link" data-view="review" type="button">
+      ${icoSvg(SVG.back)}
+      Back to Review
+    </button>
+    <div style="margin-top:16px">
+      <span class="wm-overline">Results</span>
+      <h1 class="page-title">Analysis Results</h1>
+      <p class="page-sub">IT Strategy Diagnostic for ${escapeHtml(companyName)} — Standard Diagnostic</p>
+    </div>
+    <div class="tabs-nav" id="results-tabs"></div>
+    <div id="results-body" style="margin-top:24px"></div>
+  `;
+  renderResultsTabs();
+  renderResultsBody(companyName);
+}
+
+function renderResultsTabs() {
+  const host = $('#results-tabs');
+  host.innerHTML = '';
+  for (const t of RESULTS_TABS) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tab-btn' + (state.resultsTab === t.id ? ' active' : '');
+    btn.innerHTML = `${icoSvg(t.iconPath)} <span>${escapeHtml(t.label)}</span>`;
+    btn.onclick = () => {
+      state.resultsTab = t.id;
+      renderResultsTabs();
+      renderResultsBody();
+    };
+    host.appendChild(btn);
+  }
+}
+
+// Demo results data — approximates what the engine returns
+const DEMO_RESULTS = {
+  kpis: [
+    { label: 'IT Spend % Revenue', value: '3.6%', delta: '+0.8pp vs median' },
+    { label: 'IT Spend per Employee', value: '$11.5K', delta: '-$2.1K vs median' },
+    { label: 'IT FTE %', value: '1.6%', delta: '+0.2pp vs median' },
+    { label: 'OpEx / CapEx Split', value: '70 / 30', delta: 'in line with peers' },
+  ],
+  yoy: { it: '+6.3%', rev: '+4.1%', comp: 'IT outpacing revenue' },
+  gaps: [
+    { metric: 'IT Spend % Revenue', actualFmt: '3.6%', medianFmt: '2.8%', gapPct: 0.008, gapDollars: 4040000 },
+    { metric: 'IT Spend per Employee', actualFmt: '$11.5K', medianFmt: '$13.6K', gapPct: -0.154, gapDollars: -3360000 },
+    { metric: 'IT FTE %', actualFmt: '1.6%', medianFmt: '1.4%', gapPct: 0.002, gapDollars: 320000 },
+    { metric: 'Transformation Spend %', actualFmt: '25.5%', medianFmt: '18.0%', gapPct: 0.075, gapDollars: 3780000 },
+  ],
+  opportunities: [
+    { name: 'Cloud cost optimization', low: 850000, base: 1400000, high: 2100000, confidence: 'High' },
+    { name: 'Vendor rationalization', low: 600000, base: 1100000, high: 1800000, confidence: 'Medium' },
+    { name: 'Automation / RPA', low: 300000, base: 650000, high: 1200000, confidence: 'Medium' },
+    { name: 'Application sunsetting', low: 200000, base: 450000, high: 900000, confidence: 'Low' },
+  ],
+  findings: [
+    'IT spend as a share of revenue is running 0.8 pp above the industry median, driven primarily by transformation-period elevation rather than steady-state overspend.',
+    'IT spend per employee is 15% below median, suggesting an undercapitalized end-user services posture that may constrain productivity gains.',
+    'Transformation spend share (25.5%) is well above the 18% median, consistent with an active ERP/Cloud modernization program rolling off in the next 18 months.',
+    'OpEx/CapEx mix is in line with peers; no immediate rebalancing indicated.',
+  ],
+  whyItMatters: 'The elevated transformation spend is a temporary signal — the steady-state cost base is closer to industry norms than the headline IT/Revenue ratio suggests. Planning reinvestment (or return) of transformation-period dollars is the highest-leverage strategic decision over the next 12 months.',
+  recommendations: [
+    { title: 'Cloud cost optimization', priority: 'High', value: '$850K - $2.1M', confidence: 'High', description: 'Right-size reserved instances and implement FinOps practices. Tagging and budget alerts can recover 10-15% of cloud spend within two quarters.' },
+    { title: 'Vendor rationalization', priority: 'Medium', value: '$600K - $1.8M', confidence: 'Medium', description: 'Consolidate overlapping SaaS tools, particularly in collaboration and security. Initial inventory shows ~15% redundancy.' },
+    { title: 'Automation / RPA', priority: 'Medium', value: '$300K - $1.2M', confidence: 'Medium', description: 'Target manual finance and HR processes first; payback typically inside 12 months with internal labor savings.' },
+    { title: 'Application sunsetting', priority: 'Low', value: '$200K - $900K', confidence: 'Low', description: 'Retire legacy apps identified in roadmap. Dependency mapping needed before committing dates.' },
+  ],
+  qa: {
+    confidence: 'Medium',
+    statement: 'Results are directionally reliable. Some supporting workforce data was inferred from defaults — add contractor detail to raise confidence.',
+    checks: [
+      { name: 'Revenue vs IT spend sanity', msg: 'Ratio within 0.5x–10x of industry median — looks plausible.', passed: true, severity: 'Info' },
+      { name: 'OpEx + CapEx equals total', msg: 'Breakdown sums to 100% of reported total IT spend.', passed: true, severity: 'Info' },
+      { name: 'IT FTE coverage', msg: 'IT FTEs count provided but contractor split missing — using industry ratio as fallback.', passed: false, severity: 'Warning' },
+      { name: 'Benchmark data availability', msg: 'All four core KPIs matched Gartner 2026 industry percentiles.', passed: true, severity: 'Info' },
+      { name: 'Transformation elevation factor applied', msg: 'Active transformation detected — baseline adjusted by -7%.', passed: true, severity: 'Info' },
+    ],
+    caveats: [
+      'Contractor spend was estimated using industry ratio (~12% of labor) — confirm for precision.',
+      'Benchmarks use Gartner 2026 midpoint values; actual peer distributions may differ.',
+      'Opportunity ranges are illustrative; final business cases require detailed workstream scoping.',
+    ],
+  },
+};
+
+function renderResultsBody(companyName) {
+  const host = $('#results-body');
+  const data = DEMO_RESULTS;
+  if (!companyName) companyName = (gatherIntakeForReview().company.company_name) || 'Acme Corp';
+
+  if (state.resultsTab === 'summary') {
+    host.innerHTML = `
+      <div class="panel">
+        <div class="row-between" style="margin-bottom:8px">
+          <div>
+            <span class="wm-overline">Executive Summary</span>
+            <h3 style="margin:4px 0 0;font-size:18px">${escapeHtml(companyName)}</h3>
+          </div>
+          <span class="wm-badge wm-badge-primary">Standard Diagnostic</span>
+        </div>
+        <p style="margin:12px 0 0;font-size:14px;line-height:1.65;color:var(--foreground)">
+          ${escapeHtml(companyName)}'s IT spend is 3.6% of revenue, 0.8 percentage points above the industry median. This elevation reflects an active transformation program rather than steady-state overspend. Base-case opportunity identification totals <strong>$3.6M across four initiatives</strong> with high confidence on cloud cost optimization. Overall confidence is <strong>Medium</strong> — adding contractor breakdown and vendor detail would raise it.
+        </p>
+      </div>
+      <div class="kpi-grid" style="margin-top:16px">
+        ${data.kpis.map(k => `
+          <div class="panel">
+            <span class="wm-overline">${escapeHtml(k.label)}</span>
+            <div class="kpi-val">${escapeHtml(k.value)}</div>
+            <div class="kpi-delta">${escapeHtml(k.delta)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <span class="wm-overline">Year-over-Year</span>
+        <h3 style="margin:4px 0 16px;font-size:16px">Trend Analysis</h3>
+        <div class="yoy-grid">
+          <div>
+            <div class="ydim">IT Spend Change</div>
+            <div class="ybig" style="color:var(--wm-magenta)">${escapeHtml(data.yoy.it)}</div>
+          </div>
+          <div>
+            <div class="ydim">Revenue Change</div>
+            <div class="ybig" style="color:var(--wm-magenta)">${escapeHtml(data.yoy.rev)}</div>
+          </div>
+          <div>
+            <div class="ydim">Comparison</div>
+            <div class="ymed">${escapeHtml(data.yoy.comp)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (state.resultsTab === 'benchmark') {
+    host.innerHTML = `
+      <div class="panel">
+        <span class="wm-overline">Benchmark</span>
+        <h3 style="margin:4px 0 4px;font-size:16px">Core KPIs vs Industry Percentiles</h3>
+        <p class="panel-sub">Vertical reference shows P10/P25/Median/P75/P90 bounds</p>
+        <div class="bench-chart" id="bench-chart"></div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <span class="wm-overline">Benchmark</span>
+        <h3 style="margin:4px 0 4px;font-size:16px">Gap Analysis Detail</h3>
+        <p class="panel-sub">Dollar and percentage gaps vs benchmark tiers</p>
+        <div style="overflow-x:auto">
+          <table class="review-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th style="text-align:right">Actual</th>
+                <th style="text-align:right">Median</th>
+                <th style="text-align:right">Gap vs Median</th>
+                <th style="text-align:right">Gap ($)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.gaps.map(g => `
+                <tr>
+                  <td><strong>${escapeHtml(g.metric)}</strong></td>
+                  <td class="tmono" style="text-align:right">${escapeHtml(g.actualFmt)}</td>
+                  <td class="tmono" style="text-align:right">${escapeHtml(g.medianFmt)}</td>
+                  <td class="tmono" style="text-align:right;color:${g.gapPct > 0 ? 'var(--wm-red)' : '#0A7B3E'};font-weight:700">
+                    ${g.gapPct > 0 ? '+' : ''}${(g.gapPct * 100).toFixed(1)}pp
+                  </td>
+                  <td class="tmono" style="text-align:right;color:${g.gapDollars > 0 ? 'var(--wm-red)' : '#0A7B3E'};font-weight:700">
+                    ${g.gapDollars > 0 ? '' : '-'}$${fmt$(Math.abs(g.gapDollars))}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    renderBenchmarkChart();
+  } else if (state.resultsTab === 'opportunities') {
+    const totalBase = data.opportunities.reduce((s, o) => s + o.base, 0);
+    const totalLow = data.opportunities.reduce((s, o) => s + o.low, 0);
+    const totalHigh = data.opportunities.reduce((s, o) => s + o.high, 0);
+    host.innerHTML = `
+      <div class="panel" style="display:flex;gap:24px;align-items:center">
+        <div>
+          <span class="wm-overline">Total Base-Case Opportunity</span>
+          <div class="kpi-val" style="font-size:48px">$${fmt$(totalBase)}</div>
+        </div>
+        <div style="height:48px;width:1px;background:var(--border)"></div>
+        <div>
+          <div class="ydim">Range</div>
+          <div style="font-size:16px;font-weight:700;color:var(--muted-foreground);margin-top:4px">
+            $${fmt$(totalLow)} – $${fmt$(totalHigh)}
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <span class="wm-overline">Opportunity Detail</span>
+        <h3 style="margin:4px 0 12px;font-size:16px">Modules</h3>
+        <div style="overflow-x:auto">
+          <table class="review-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th style="text-align:right">Low</th>
+                <th style="text-align:right">Base</th>
+                <th style="text-align:right">High</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.opportunities.map(o => `
+                <tr>
+                  <td><strong>${escapeHtml(o.name)}</strong></td>
+                  <td class="tmono" style="text-align:right">$${fmt$(o.low)}</td>
+                  <td class="tmono" style="text-align:right;color:var(--wm-magenta);font-weight:700">$${fmt$(o.base)}</td>
+                  <td class="tmono" style="text-align:right">$${fmt$(o.high)}</td>
+                  <td>${confidenceBadge(o.confidence)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } else if (state.resultsTab === 'findings') {
+    host.innerHTML = `
+      <div class="panel">
+        <span class="wm-overline">Analysis</span>
+        <h3 style="margin:4px 0 16px;font-size:18px">Key Findings</h3>
+        <ul class="findings">
+          ${data.findings.map((f, i) => `
+            <li><span class="f-num">${i + 1}</span><span>${escapeHtml(f)}</span></li>
+          `).join('')}
+        </ul>
+      </div>
+      <div class="key-message">
+        <span class="wm-phase-overline" style="color:var(--wm-magenta);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em">Why It Matters</span>
+        <p style="margin:8px 0 0;line-height:1.65;color:rgba(255,255,255,.9);font-size:14px">
+          ${escapeHtml(data.whyItMatters)}
+        </p>
+      </div>
+      <div style="margin-top:16px">
+        <span class="wm-overline">Priorities</span>
+        <h3 style="margin:4px 0 16px;font-size:18px">Recommendations</h3>
+        <div class="rec-grid">
+          ${data.recommendations.map(r => `
+            <div class="panel rec-card rec-${r.priority.toLowerCase()}">
+              <div class="row-between" style="margin-bottom:8px;align-items:flex-start">
+                <h4 style="margin:0;font-size:15px">${escapeHtml(r.title)}</h4>
+                ${confidenceBadge(r.confidence)}
+              </div>
+              <p style="margin:0 0 8px;font-size:12px;color:var(--muted-foreground)">
+                <strong>Priority:</strong> ${escapeHtml(r.priority)} | <strong>Value:</strong> ${escapeHtml(r.value)}
+              </p>
+              <p style="margin:0;font-size:13px;line-height:1.6;color:var(--muted-foreground)">${escapeHtml(r.description)}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  } else if (state.resultsTab === 'caveats') {
+    const passed = data.qa.checks.filter(c => c.passed).length;
+    host.innerHTML = `
+      <div class="panel">
+        <span class="wm-overline">Quality</span>
+        <h3 style="margin:4px 0 12px;font-size:18px">Overall Confidence</h3>
+        <div class="row" style="gap:12px">
+          ${confidenceBadge(data.qa.confidence)}
+          <p style="margin:0;font-size:14px">${escapeHtml(data.qa.statement)}</p>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h3 style="margin:0 0 4px;font-size:16px">Quality Assurance Checks</h3>
+        <p class="panel-sub" style="margin:0 0 12px">${passed} of ${data.qa.checks.length} checks passed</p>
+        <div class="stack-2">
+          ${data.qa.checks.map(c => `
+            <div class="alert ${c.passed ? 'alert-ok' : c.severity === 'Warning' ? 'alert-warn' : c.severity === 'Critical' ? 'alert-err' : 'alert-info'}">
+              <span class="alert-dot"></span>
+              <div style="flex:1;font-size:13px">
+                <strong>${escapeHtml(c.name)}</strong>
+                <span style="color:var(--muted-foreground);margin-left:6px">${escapeHtml(c.msg)}</span>
+              </div>
+              <span class="wm-badge ${c.severity === 'Critical' ? 'wm-badge-err' : c.severity === 'Warning' ? 'wm-badge-warn' : 'wm-badge-neutral'}">${escapeHtml(c.severity)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <span class="wm-overline">Limitations</span>
+        <h3 style="margin:4px 0 12px;font-size:16px">Caveats</h3>
+        <ul class="caveat-list">
+          ${data.qa.caveats.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  } else if (state.resultsTab === 'export') {
+    host.innerHTML = `
+      <div class="panel">
+        <span class="wm-overline">Deliverables</span>
+        <h3 style="margin:4px 0 4px;font-size:18px">Export Reports</h3>
+        <p class="panel-sub">Download diagnostic reports. Each report contains the full analysis with data, calculations, and narrative.</p>
+        <div class="stack-3" style="margin-top:16px">
+          ${exportRow('html', 'Interactive Report', 'Client-ready', 'Self-contained HTML with charts, tabs, benchmarks, and recommendations. Print to PDF.', true)}
+          ${exportRow('summary', 'Executive Summary', 'Quick share', 'One-page markdown with KPIs, gaps, opportunities, and findings.')}
+          ${exportRow('full', 'Full Report (10 Sheets)', 'Comprehensive', 'Complete structured report — financials, benchmarks, opportunities, workforce, and recommendations.')}
+          ${exportRow('cot', 'Chain of Thought', 'Audit trail', 'Full audit showing every calculation, benchmark, and confidence assessment.')}
+        </div>
+      </div>
+      <div class="key-message" style="margin-top:16px">
+        <span class="wm-phase-overline" style="color:var(--wm-magenta);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em">Tip</span>
+        <p style="margin:8px 0 0;line-height:1.65;color:rgba(255,255,255,.9);font-size:14px">
+          The <strong>Interactive Report</strong> opens in any browser. Use <strong>Ctrl/Cmd+P</strong> to print as PDF. Markdown reports render in Notion, Confluence, or any viewer.
+        </p>
+      </div>
+      <div class="alert alert-info" style="margin-top:16px;font-size:13px">
+        <span class="alert-dot"></span>
+        <div style="flex:1">Standalone preview — exports run server-side in the real app. This view shows the UI layout only.</div>
+      </div>
+    `;
+  }
+}
+
+function exportRow(key, title, badge, desc, featured) {
+  return `
+    <div class="export-row ${featured ? 'featured' : ''}">
+      <div class="export-icon">${icoSvg(SVG.upload)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="row" style="gap:8px">
+          <h4 style="margin:0;font-size:14px">${escapeHtml(title)}</h4>
+          <span class="wm-badge ${featured ? 'wm-badge-primary' : 'wm-badge-neutral'}">${escapeHtml(badge)}</span>
+        </div>
+        <p style="margin:4px 0 0;font-size:12px;color:var(--muted-foreground)">${escapeHtml(desc)}</p>
+      </div>
+      <button class="btn ${featured ? 'btn-primary' : 'btn-outline'} btn-sm">${icoSvg(SVG.upload)} Download</button>
+    </div>
+  `;
+}
+
+function confidenceBadge(level) {
+  const cls = level === 'High' ? 'wm-badge-ok' : level === 'Medium' ? 'wm-badge-warn' : 'wm-badge-err';
+  const dot = level === 'High' ? '🟢' : level === 'Medium' ? '🟡' : '🔴';
+  return `<span class="wm-badge ${cls}">${dot} ${escapeHtml(level)}</span>`;
+}
+
+// Horizontal bar chart of benchmark gaps
+function renderBenchmarkChart() {
+  const host = $('#bench-chart');
+  if (!host) return;
+  const data = DEMO_RESULTS.gaps;
+  host.innerHTML = data.map(g => {
+    const pct = Math.max(-0.5, Math.min(0.5, g.gapPct));
+    const pctBar = (Math.abs(pct) / 0.5) * 50; // percentage of half-width
+    const positive = g.gapPct > 0;
+    return `
+      <div class="bench-row">
+        <div class="bench-label">${escapeHtml(g.metric)}</div>
+        <div class="bench-track">
+          <div class="bench-zero"></div>
+          <div class="bench-bar ${positive ? 'pos' : 'neg'}" style="width:${pctBar}%; ${positive ? 'left:50%' : `right:50%`}"></div>
+        </div>
+        <div class="bench-val ${positive ? 'pos' : 'neg'}">${positive ? '+' : ''}${(g.gapPct * 100).toFixed(1)}pp</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function fmt$(n) {
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return Math.round(n).toString();
+}
+
+/* ======= app.js ======= */
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// Global state + router
+// ══════════════════════════════════════════════════════════════
+const state = {
+  selectedLevel: 'Quick Read', // matches screenshot state
+  currentView: 'new',
+  // Wizard state
+  wizardIndex: 0,
+  answers: {},
+  // Form state
+  formStep: 0,
+  formPriorExpanded: false,
+  formData: null,
+  // File-drop state
+  fdStep: 'upload',
+  fdFiles: {},
+  fdParsed: {},
+  fdParseStatus: 'idle',
+  fdParseMessages: [],
+  fdCompany: {},
+};
+
+const VIEW_MAP = {
+  new: { sel: '#view-new', init: renderNewAnalysisView },
+  dashboard: { sel: '#view-dashboard', init: renderDashboardView },
+  wizard: { sel: '#view-wizard', init: renderWizardView },
+  form: { sel: '#view-form', init: renderFormView },
+  'file-drop': { sel: '#view-filedrop', init: renderFileDropView },
+  review: { sel: '#view-review', init: renderReviewView },
+  results: { sel: '#view-results', init: renderResultsView },
+};
+
+function showView(view) {
+  state.currentView = view;
+  $$('.view').forEach(v => v.classList.remove('active'));
+  const entry = VIEW_MAP[view] || VIEW_MAP.new;
+  const target = document.querySelector(entry.sel);
+  if (target) target.classList.add('active');
+  if (typeof entry.init === 'function') entry.init();
+
+  // Sidebar active state: any sub-view stays on "New Analysis" except dashboard
+  $$('.sidebar nav a').forEach(a => a.classList.remove('active'));
+  const sidebarView = view === 'dashboard' ? 'dashboard' : 'new';
+  const activeLink = document.querySelector(`.sidebar nav a[data-view="${sidebarView}"]`);
+  if (activeLink) activeLink.classList.add('active');
+
+  window.scrollTo(0, 0);
+}
+
+// Global click delegation for [data-view] elements
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-view]');
+  if (t && t.dataset.view) {
+    e.preventDefault();
+    showView(t.dataset.view);
+  }
+});
+
+// Boot
+showView('new');
+</script>
+</body>
+</html>
